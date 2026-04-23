@@ -10,17 +10,29 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.mclavo.ecommerce.exception.CustomerNotFoundException;
+import com.mclavo.ecommerce.exception.ProductPurchaseException;
+
+import jakarta.persistence.EntityNotFoundException;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<String> handle(CustomerNotFoundException exception) {
+    @ExceptionHandler(ProductPurchaseException.class)
+    public ResponseEntity<String> handle(ProductPurchaseException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
+    }
+
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handle(EntityNotFoundException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(exception.getMsg());
+                .body(exception.getMessage());
     }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDetailResponse> handle(MethodArgumentNotValidException exception) {
