@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 
 import com.mclavo.ecommerce.category.Category;
 
-import jakarta.validation.constraints.NotNull;
-
 @Service
 public class ProductMapper {
 
