@@ -1,6 +1,6 @@
 package com.mclavo.ecommerce.order;
 
-enum PaymentMethod {
+public enum PaymentMethod {
     CREDIT_CARD,
     DEBIT_CARD,
     PAYPAL,

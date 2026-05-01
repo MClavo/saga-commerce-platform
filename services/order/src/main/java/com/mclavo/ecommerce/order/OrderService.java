@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mclavo.ecommerce.customer.CustomerClient;
 import com.mclavo.ecommerce.exception.BusinessException;
+import com.mclavo.ecommerce.payment.PaymentClient;
+import com.mclavo.ecommerce.payment.PaymentRequest;
 import com.mclavo.ecommerce.product.ProductClient;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -22,6 +24,7 @@ class OrderService {
     private final OrderLineRepository orderLineRepository;
     private final OrderMapper orderMapper;
     private final OrderProducer orderProducer;
+    private final PaymentClient paymentClient;
 
     // What happens if payment fails? Do we need to roll back the order creation?
     // Do we need to implement a saga pattern for this?
@@ -49,6 +52,16 @@ class OrderService {
 
         // Save the order and order lines in the database
         Order savedOrder = orderRepository.save(order);
+
+        // Request payment (feign client)
+        paymentClient.requestOrderPayment(
+            new PaymentRequest(
+                    savedOrder.getTotalAmount(),
+                    savedOrder.getPaymentMethod(),
+                    savedOrder.getId(),
+                    savedOrder.getReference(),
+                    customer)
+        );
 
         // Send order confirmation (Kafka)
         orderProducer.publishOrderConfirmation(
