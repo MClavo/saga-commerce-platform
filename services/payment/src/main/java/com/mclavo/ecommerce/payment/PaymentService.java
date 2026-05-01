@@ -15,7 +15,7 @@ class PaymentService {
     private final PaymentMapper paymentMapper;
     private final NotificationProducer notificationProducer;
 
-    public Payment createPayment(PaymentRequest request) {
+    public Integer createPayment(PaymentRequest request) {
 
         var payment = paymentRepository.save(paymentMapper.toPayment(request));
 
@@ -31,7 +31,7 @@ class PaymentService {
                 )
         );
 
-        return payment;
+        return payment.getId();
     }
 
 }
