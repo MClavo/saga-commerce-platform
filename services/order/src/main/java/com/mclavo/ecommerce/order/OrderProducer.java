@@ -23,7 +23,7 @@ class OrderProducer {
         log.info("Sending order confirmation for order reference: {}", orderConfirmation.orderReference());
         Message<OrderConfirmation> message = MessageBuilder
                 .withPayload(orderConfirmation)
-                .setHeader(KafkaHeaders.TOPIC, kafkaProperties.orderConfirmation())
+                .setHeader(KafkaHeaders.TOPIC, kafkaProperties.orderTopic())
                 .build();
 
         kafkaTemplate.send(message);

@@ -11,7 +11,7 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaConfig {
     @Bean
     NewTopic orderConfirmationTopic(KafkaOrderProperties properties) {
-        return TopicBuilder.name(properties.orderConfirmation())
+        return TopicBuilder.name(properties.orderTopic())
                 .partitions(1)
                 .replicas(1)
                 .build();
