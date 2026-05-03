@@ -58,7 +58,7 @@ class Order {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(insertable = false, nullable = false)
+    @Column(insertable = false)
     private LocalDateTime updatedAt;
 
     public void addOrderLine(Integer productId, Double quantity, BigDecimal unitPrice) {

@@ -1,31 +1,32 @@
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-        
-      routes:
-        - id: customer-service
-          uri: lb:http://CUSTOMER-SERVICE
-          predicates:
-            - Path=/api/v1/customers/**
+      server:
+        webflux:  
+          discovery:
+            locator:
+              enabled: true
+          routes:
+            - id: customer-service
+              uri: lb:http://CUSTOMER-SERVICE
+              predicates:
+                - Path=/api/v1/customers/**
 
-        - id: order-service
-          uri: lb:http://ORDER-SERVICE
-          predicates:
-            - Path=/api/v1/orders/**
+            - id: order-service
+              uri: lb:http://ORDER-SERVICE
+              predicates:
+                - Path=/api/v1/orders/**
 
-        - id: product-service
-          uri: lb:http://PRODUCT-SERVICE
-          predicates:
-            - Path=/api/v1/products/**
-        
-        # TODO: Enforce security, only from other services, not from external clients
-        - id: payment-service
-          uri: lb:http://PAYMENT-SERVICE
-          predicates:
-            - Path=/api/v1/payments/**
+            - id: product-service
+              uri: lb:http://PRODUCT-SERVICE
+              predicates:
+                - Path=/api/v1/products/**
+            
+            # TODO: Enforce security, only from other services, not from external clients
+            - id: payment-service
+              uri: lb:http://PAYMENT-SERVICE
+              predicates:
+                - Path=/api/v1/payments/**
 
 server:
   port: 8222

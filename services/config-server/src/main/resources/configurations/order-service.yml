@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/order
+    url: jdbc:postgresql://localhost:5432/orders
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -17,6 +17,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
+        spring.json.trusted.packages: "com.mclavo.ecommerce.*"
         spring.json.add.type.mapping: orderConfirmation:com.mclavo.ecommerce.order.orderConfirmation
 
 server:
@@ -29,5 +30,5 @@ application:
     payment-url: http://localhost:8222/api/v1/payments
     
   kafka:
-    order-confirmation: order-confirmation
+    order-topic: order-confirmation
   

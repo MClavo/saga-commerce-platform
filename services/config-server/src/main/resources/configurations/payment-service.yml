@@ -17,7 +17,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.mapping: paymentConfirmation:com.mclavo.ecommerce.notification.PaymentNotificationRequest
+        spring.json.trusted.packages: "com.mclavo.ecommerce.*"
+        spring.json.type.mapping: paymentConfirmation:com.mclavo.ecommerce.notification.PaymentNotificationRequest
 
 server:
   port: 8060

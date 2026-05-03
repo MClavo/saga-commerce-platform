@@ -20,7 +20,14 @@ public class NotificationConsumer {
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
 
-    @KafkaListener(topics = "${application.kafka.payment-topic}")
+    @KafkaListener(
+        topics = "${application.kafka.payment-topic}",
+        groupId = "paymentGroup",
+        properties = {
+                "spring.json.use.type.headers=false",
+                "spring.json.value.default.type=com.mclavo.ecommerce.payment.PaymentConfirmation"
+        }
+    )
     public void consumePaymentSuccessNotification(PaymentConfirmation paymentConfirmation) {
         log.info("Consuming payment confirmation: {}", paymentConfirmation);
 
@@ -43,7 +50,14 @@ public class NotificationConsumer {
         );
     }
 
-    @KafkaListener(topics = "${application.kafka.order-topic}")
+    @KafkaListener(
+        topics = "${application.kafka.order-topic}",
+        groupId = "orderGroup",
+        properties = {
+                "spring.json.use.type.headers=false",
+                "spring.json.value.default.type=com.mclavo.ecommerce.order.OrderConfirmation"
+        }
+    )
     public void consumeOrderNotification(OrderConfirmation orderConfirmation) {
         log.info("Consuming order confirmation: {}", orderConfirmation);
 

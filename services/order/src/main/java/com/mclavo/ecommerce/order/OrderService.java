@@ -29,16 +29,18 @@ class OrderService {
     // What happens if payment fails? Do we need to roll back the order creation?
     // Do we need to implement a saga pattern for this?
 
+    // TODO: Idempotency: If the client retries the request, we should not create duplicate orders. We can use the reference field for this.
     @Transactional
     public Integer createOrder(OrderRequest request) {
         // Validate that the customer exists openfeign client to customer service
         var customer = customerClient.findCustomerById(request.customerId())
-            .orElseThrow(() -> new BusinessException(
-                "Order failed: Customer not found with ID: " + request.customerId()));
+                .orElseThrow(() -> new BusinessException(
+                        "Order failed: Customer not found with ID: " + request.customerId()));
 
         // purchase the products (RestClient)
         var purchasedProducts = productClient.purchaseProducts(request.products());
 
+        // FIX: total amount must be calculated based on the purchased products, not sent by the client
         // Create order
         Order order = orderMapper.toOrder(request);
 
@@ -55,36 +57,35 @@ class OrderService {
 
         // Request payment (feign client)
         paymentClient.requestOrderPayment(
-            new PaymentRequest(
-                    savedOrder.getTotalAmount(),
-                    savedOrder.getPaymentMethod(),
-                    savedOrder.getId(),
-                    savedOrder.getReference(),
-                    customer)
-        );
+                new PaymentRequest(
+                        savedOrder.getTotalAmount(),
+                        savedOrder.getPaymentMethod(),
+                        savedOrder.getId(),
+                        savedOrder.getReference(),
+                        customer));
 
         // Send order confirmation (Kafka)
         orderProducer.publishOrderConfirmation(
-            new OrderConfirmation(
-                    savedOrder.getReference(),
-                    savedOrder.getTotalAmount(),
-                    savedOrder.getPaymentMethod(),
-                    customer,
-                    purchasedProducts));
+                new OrderConfirmation(
+                        savedOrder.getReference(),
+                        savedOrder.getTotalAmount(),
+                        savedOrder.getPaymentMethod(),
+                        customer,
+                        purchasedProducts));
 
         return savedOrder.getId();
     }
 
-    public List<OrderResponse> findAll(String param) {
+    public List<OrderResponse> findAll() {
         return orderRepository.findAll().stream()
-            .map(orderMapper::toOrderResponse)
-            .toList();
+                .map(orderMapper::toOrderResponse)
+                .toList();
     }
 
     public OrderResponse findById(Integer id) {
         var order = orderRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException(
-                "Order not found with ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Order not found with ID: " + id));
         return orderMapper.toOrderResponse(order);
     }
 
