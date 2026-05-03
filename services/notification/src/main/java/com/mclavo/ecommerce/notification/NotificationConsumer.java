@@ -40,7 +40,7 @@ public class NotificationConsumer {
         );
 
         // Send email
-        String name = paymentConfirmation.customerFirstName() + " " + paymentConfirmation.customerLastName();
+        String name = paymentConfirmation.customerFirstname() + " " + paymentConfirmation.customerLastname();
 
         emailService.sendPaymentSuccessEmail(
             paymentConfirmation.customerEmail(),

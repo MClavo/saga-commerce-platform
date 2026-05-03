@@ -30,6 +30,7 @@ class OrderService {
     // Do we need to implement a saga pattern for this?
 
     // TODO: Idempotency: If the client retries the request, we should not create duplicate orders. We can use the reference field for this.
+    // FIX: same reference can be used for different orders.
     @Transactional
     public Integer createOrder(OrderRequest request) {
         // Validate that the customer exists openfeign client to customer service

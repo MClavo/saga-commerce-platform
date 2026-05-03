@@ -87,6 +87,26 @@ services:
       - microservices-net
     restart: always
 
+  Zipkin:
+    image: openzipkin/zipkin
+    container_name: ms_zipkin
+    ports:
+      - 9411:9411
+    networks:
+      - microservices-net
+
+  Keycloak:
+    image: quay.io/keycloak/keycloak:26.6
+    container_name: ms_keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 9098:8080
+    networks:
+      - microservices-net
+    command: ["start-dev"]
+
 networks:
   microservices-net:
     driver: bridge
