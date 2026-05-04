@@ -2,27 +2,17 @@ package com.mclavo.ecommerce.product;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
 
-@Component
-public class ProductClient {
+@FeignClient(
+    name = "product-service",
+    path = "/api/v1/products"
+)
+public interface ProductClient {
 
-    private final RestClient restClient;
 
-    ProductClient(@Qualifier("productRestClient") RestClient restClient) {
-        this.restClient = restClient;
-    }
+    @PostMapping("/purchase")
+    public List<PurchaseResponse> purchaseProducts(List<PurchaseRequest> requests);
 
-    public List<PurchaseResponse> purchaseProducts(List<PurchaseRequest> requests) {
-        return restClient
-                .post()
-                .uri("/purchase")
-                .body(requests)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<PurchaseResponse>>() {
-                });
-    }
 }
