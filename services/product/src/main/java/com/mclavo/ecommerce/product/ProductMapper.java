@@ -36,13 +36,13 @@ public class ProductMapper {
         );
     }
 
-    public ProductPurchaseResponse toProductPurchaseResponse(Product product, Double quantity) {
+    public ProductPurchaseResponse toProductPurchaseResponse(Product product, Integer quantity) {
             return new ProductPurchaseResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                quantity.doubleValue()
+                quantity
             );
     }
 

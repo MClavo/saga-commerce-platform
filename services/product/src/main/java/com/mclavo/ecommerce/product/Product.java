@@ -29,7 +29,7 @@ public class Product {
 
     private String name;
     private String description;
-    private Double availableQuantity;
+    private Integer availableQuantity;
     private BigDecimal price;
 
     @ManyToOne

@@ -16,7 +16,7 @@ public record ProductRequest(
     String description,
     
     @Positive(message = "Available quantity should be positive")
-    Double availableQuantity,
+    Integer availableQuantity,
     
     @Positive(message = "Price should be positive")
     BigDecimal price,

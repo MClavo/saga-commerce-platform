@@ -1,5 +1,6 @@
 package com.mclavo.ecommerce.order;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -29,7 +30,8 @@ class OrderService {
     // What happens if payment fails? Do we need to roll back the order creation?
     // Do we need to implement a saga pattern for this?
 
-    // TODO: Idempotency: If the client retries the request, we should not create duplicate orders. We can use the reference field for this.
+    // TODO: Idempotency: If the client retries the request, we should not create
+    // duplicate orders. We can use the reference field for this.
     // FIX: same reference can be used for different orders.
     @Transactional
     public Integer createOrder(OrderRequest request) {
@@ -41,7 +43,6 @@ class OrderService {
         // purchase the products (RestClient)
         var purchasedProducts = productClient.purchaseProducts(request.products());
 
-        // FIX: total amount must be calculated based on the purchased products, not sent by the client
         // Create order
         Order order = orderMapper.toOrder(request);
 

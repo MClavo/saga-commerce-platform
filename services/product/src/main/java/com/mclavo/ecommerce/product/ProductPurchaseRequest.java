@@ -7,5 +7,5 @@ public record ProductPurchaseRequest(
     Integer productId,
 
     @NotNull(message = "Quantity is required")
-    Double quantity
+    Integer quantity
 ) { }

@@ -3,7 +3,9 @@ package com.mclavo.ecommerce.order;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,18 +21,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Getter
-@Setter
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "customer_order")
 class Order {
@@ -38,19 +35,22 @@ class Order {
     @Id
     @GeneratedValue
     private Integer id;
-    private String reference;
-    private BigDecimal totalAmount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
+    @Column(nullable = false, unique = true)
+    private String reference;
+
+    @Column(nullable = false)
     private String customerId;
 
-    @Builder.Default
-    @OneToMany(
-        mappedBy = "order",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal totalAmount = BigDecimal.ZERO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @Getter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderLine> orderLines = new ArrayList<>();
 
     @CreatedDate
@@ -61,14 +61,28 @@ class Order {
     @Column(insertable = false)
     private LocalDateTime updatedAt;
 
-    public void addOrderLine(Integer productId, Double quantity, BigDecimal unitPrice) {
-        OrderLine orderLine = OrderLine.builder()
-                .order(this)
-                .productId(productId)
-                .quantity(quantity)
-                .unitPrice(unitPrice)
-                .build();
+    Order(String reference, String customerId, PaymentMethod paymentMethod) {
+        this.reference = Objects.requireNonNull(reference, "Reference cannot be null");
+        this.customerId = Objects.requireNonNull(customerId, "Customer id cannot be null");
+        this.paymentMethod = Objects.requireNonNull(paymentMethod, "Payment method cannot be null");
+    }
+
+    /**
+     * Adds an order line to the order and updates the total amount.
+     *
+     * @param productId the ID of the product being ordered
+     * @param quantity the quantity of the product being ordered
+     * @param unitPrice the unit price of the product being ordered
+     */
+    public void addOrderLine(Integer productId, Integer quantity, BigDecimal unitPrice) {
+        OrderLine orderLine = new OrderLine(this, productId, quantity, unitPrice);
 
         orderLines.add(orderLine);
+        totalAmount = totalAmount.add(orderLine.getSubtotal());
+    }
+
+    public List<OrderLine> getOrderLines() {
+        return Collections.unmodifiableList(orderLines);
+
     }
 }

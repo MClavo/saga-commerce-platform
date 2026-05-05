@@ -1,24 +1,22 @@
 package com.mclavo.ecommerce.order;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Objects;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 @Entity
 @Table(name = "customer_line")
 class OrderLine {
@@ -27,18 +25,37 @@ class OrderLine {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
-    
-    private Integer productId;
-    private Double quantity;
-    private BigDecimal unitPrice;
 
-    // May need to consider adding total price for the line (quantity * unitPrice)
-    // for easier querying and reporting
-    // But there is no coupon or discount system in place,
-    // so there is no need to calculate the line total,
-    // it can be calculated on the fly when needed.
-    // private BigDecimal lineTotal;
+    private Integer productId;
+    private Integer quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal subtotal;
+
+    OrderLine(Order order, Integer productId, Integer quantity, BigDecimal unitPrice) {
+        Objects.requireNonNull(order, "Order cannot be null");
+        Objects.requireNonNull(productId, "Product id cannot be null");
+        Objects.requireNonNull(quantity, "Quantity cannot be null");
+        Objects.requireNonNull(unitPrice, "Unit price cannot be null");
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero");
+        }
+
+        if (unitPrice.signum() < 0) {
+            throw new IllegalArgumentException(
+                    "Unit price cannot be be negative");
+        }
+        this.order = order;
+        this.productId = productId;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.subtotal = unitPrice
+                .multiply(BigDecimal.valueOf(quantity))
+                .setScale(2, RoundingMode.HALF_UP);
+        ;
+    }
 }

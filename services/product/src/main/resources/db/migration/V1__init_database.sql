@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS product
     id integer not null primary key,
     description varchar(255),
     name varchar(255),
-    available_quantity double precision not null,
+    available_quantity integer not null,
     price numeric(38, 2),
     category_id integer
         constraint fk_category references category

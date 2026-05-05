@@ -5,6 +5,6 @@ import java.math.BigDecimal;
 public record OrderLineResponse(
         Integer id,
         Integer productId,
-        Double quantity,
+        Integer quantity,
         BigDecimal unitPrice
 ) {}
