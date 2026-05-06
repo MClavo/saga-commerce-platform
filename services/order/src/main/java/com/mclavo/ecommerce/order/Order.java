@@ -49,6 +49,10 @@ class Order {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status = OrderStatus.PENDING_PAYMENT;
+
     @Getter(AccessLevel.NONE)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderLine> orderLines = new ArrayList<>();
@@ -65,6 +69,7 @@ class Order {
         this.reference = Objects.requireNonNull(reference, "Reference cannot be null");
         this.customerId = Objects.requireNonNull(customerId, "Customer id cannot be null");
         this.paymentMethod = Objects.requireNonNull(paymentMethod, "Payment method cannot be null");
+        this.status = OrderStatus.PENDING_PAYMENT;
     }
 
     /**
@@ -84,5 +89,28 @@ class Order {
     public List<OrderLine> getOrderLines() {
         return Collections.unmodifiableList(orderLines);
 
+    }
+
+    void confirmPayment() {
+        transitionTo(OrderStatus.CONFIRMED);
+    }
+
+    void cancel() {
+        transitionTo(OrderStatus.CANCELLED);
+    }
+
+    private void transitionTo(OrderStatus targetStatus) {
+        Objects.requireNonNull(targetStatus, "Target status cannot be null");
+
+        if (status == targetStatus) {
+            return;
+        }
+
+        if (status != OrderStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException(
+                    "Cannot change order status from " + status + " to " + targetStatus);
+        }
+
+        status = targetStatus;
     }
 }

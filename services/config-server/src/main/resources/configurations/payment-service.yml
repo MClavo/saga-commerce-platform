@@ -18,7 +18,16 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.trusted.packages: "com.mclavo.ecommerce.*"
-        spring.json.type.mapping: paymentConfirmation:com.mclavo.ecommerce.notification.PaymentNotificationRequest
+        spring.json.type.mapping: paymentConfirmation:com.mclavo.ecommerce.notification.PaymentNotificationRequest,paymentProcessed:com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentProcessedEvent,paymentFailed:com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentFailedEvent
+
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: payment-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.mclavo.ecommerce.*"
 
 server:
   port: 8060
@@ -26,4 +35,7 @@ server:
 application:
   kafka:
     payment-topic: payment-topic
-  
+    order-created-topic: order-created
+    payment-processed-topic: payment-processed
+    payment-failed-topic: payment-failed
+   

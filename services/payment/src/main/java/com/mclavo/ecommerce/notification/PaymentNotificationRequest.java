@@ -2,7 +2,7 @@ package com.mclavo.ecommerce.notification;
 
 import java.math.BigDecimal;
 
-import com.mclavo.ecommerce.payment.PaymentMethod;
+import com.mclavo.ecommerce.payment.domain.PaymentMethod;
 
 public record PaymentNotificationRequest(
     String orderReference,

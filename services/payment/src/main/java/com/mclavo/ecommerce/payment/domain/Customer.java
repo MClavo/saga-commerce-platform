@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.payment;
+package com.mclavo.ecommerce.payment.domain;
 
 import org.springframework.validation.annotation.Validated;
 

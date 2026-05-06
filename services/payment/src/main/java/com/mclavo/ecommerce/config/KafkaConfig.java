@@ -11,7 +11,26 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaConfig {
     @Bean
     NewTopic paymentTopic(KafkaPaymentProperties properties) {
-        return TopicBuilder.name(properties.paymentTopic())
+        return createTopic(properties.paymentTopic());
+    }
+
+    @Bean
+    NewTopic orderCreatedTopic(KafkaPaymentProperties properties) {
+        return createTopic(properties.orderCreatedTopic());
+    }
+
+    @Bean
+    NewTopic paymentProcessedTopic(KafkaPaymentProperties properties) {
+        return createTopic(properties.paymentProcessedTopic());
+    }
+
+    @Bean
+    NewTopic paymentFailedTopic(KafkaPaymentProperties properties) {
+        return createTopic(properties.paymentFailedTopic());
+    }
+
+    private NewTopic createTopic(String topicName) {
+        return TopicBuilder.name(topicName)
                 .partitions(1)
                 .replicas(1)
                 .build();

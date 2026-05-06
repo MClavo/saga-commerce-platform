@@ -19,7 +19,8 @@ public class OrderMapper {
                 order.getReference(),
                 order.getTotalAmount(),
                 order.getPaymentMethod(),
-                order.getCustomerId()
+                order.getCustomerId(),
+                order.getStatus()
         );
     }
 

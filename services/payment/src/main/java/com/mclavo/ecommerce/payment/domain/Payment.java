@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.payment;
+package com.mclavo.ecommerce.payment.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,6 +33,10 @@ public class Payment {
     @Id
     @GeneratedValue
     private Integer id;
+
+    @Column(nullable = false, unique = true)
+    private String paymentReference;
+
     private BigDecimal amount;
     
     @Enumerated(EnumType.STRING)
