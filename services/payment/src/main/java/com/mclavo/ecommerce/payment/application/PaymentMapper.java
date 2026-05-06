@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.mclavo.ecommerce.payment.api.PaymentRequest;
 import com.mclavo.ecommerce.payment.domain.Payment;
-import com.mclavo.ecommerce.payment.infrastucture.messaging.event.OrderCreatedEvent;
+import com.mclavo.ecommerce.payment.infrastucture.messaging.event.ProductReservationSucceededEvent;
 
 @Service
 public class PaymentMapper {
@@ -19,7 +19,7 @@ public class PaymentMapper {
 
     }
 
-    Payment toPayment(OrderCreatedEvent event, String paymentReference) {
+    Payment toPayment(ProductReservationSucceededEvent event, String paymentReference) {
         return Payment.builder()
             .paymentReference(paymentReference)
             .amount(event.totalAmount())

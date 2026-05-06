@@ -20,3 +20,14 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+application:
+  kafka:
+    order-created-topic: order.created
+    product-reservation-succeeded-topic: product.reservation.succeeded
+    product-reservation-failed-topic: product.reservation.failed
+    payment-confirmed-topic: payment.confirmed
+    payment-failed-topic: payment.failed
+    order-confirmed-topic: order.confirmed
+    order-cancelled-topic: order.cancelled
+    notification-requested-topic: notification.requested
