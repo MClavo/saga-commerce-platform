@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.application;
 
 import java.util.List;
 
@@ -7,6 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mclavo.ecommerce.customer.CustomerClient;
 import com.mclavo.ecommerce.exception.BusinessException;
+import com.mclavo.ecommerce.order.api.OrderLineResponse;
+import com.mclavo.ecommerce.order.api.OrderRequest;
+import com.mclavo.ecommerce.order.api.OrderResponse;
+import com.mclavo.ecommerce.order.domain.Order;
+import com.mclavo.ecommerce.order.infrastructure.messaging.OrderProducer;
+import com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderConfirmation;
+import com.mclavo.ecommerce.order.infrastructure.persistence.OrderLineRepository;
+import com.mclavo.ecommerce.order.infrastructure.persistence.OrderRepository;
 import com.mclavo.ecommerce.payment.PaymentClient;
 import com.mclavo.ecommerce.payment.PaymentRequest;
 import com.mclavo.ecommerce.product.ProductClient;
@@ -16,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-class OrderService {
+public class OrderService {
 
     private final CustomerClient customerClient;
     private final ProductClient productClient;

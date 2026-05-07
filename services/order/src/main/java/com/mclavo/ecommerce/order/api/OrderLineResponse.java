@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.api;
 
 import java.math.BigDecimal;
 

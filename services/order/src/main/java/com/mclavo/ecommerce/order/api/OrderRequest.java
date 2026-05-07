@@ -1,14 +1,15 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.api;
 
 import java.util.List;
 
+import com.mclavo.ecommerce.order.domain.PaymentMethod;
 import com.mclavo.ecommerce.product.PurchaseRequest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-record OrderRequest(
+public record OrderRequest(
     Integer id,
     String reference,
 

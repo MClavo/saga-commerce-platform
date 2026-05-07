@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "customer_line")
-class OrderLine {
+public class OrderLine {
 
     @Id
     @GeneratedValue

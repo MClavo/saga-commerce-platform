@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import com.mclavo.ecommerce.order.domain.Order;
+import com.mclavo.ecommerce.order.domain.OrderStatus;
+import com.mclavo.ecommerce.order.domain.PaymentMethod;
+
 
 class OrderTest {
 

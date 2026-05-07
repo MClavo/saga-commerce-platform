@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.domain;
 
 public enum PaymentMethod {
     CREDIT_CARD,

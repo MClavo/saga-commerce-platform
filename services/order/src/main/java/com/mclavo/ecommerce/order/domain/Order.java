@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "customer_order")
-class Order {
+public class Order {
 
     @Id
     @GeneratedValue
@@ -65,7 +65,7 @@ class Order {
     @Column(insertable = false)
     private LocalDateTime updatedAt;
 
-    Order(String reference, String customerId, PaymentMethod paymentMethod) {
+    public Order(String reference, String customerId, PaymentMethod paymentMethod) {
         this.reference = Objects.requireNonNull(reference, "Reference cannot be null");
         this.customerId = Objects.requireNonNull(customerId, "Customer id cannot be null");
         this.paymentMethod = Objects.requireNonNull(paymentMethod, "Payment method cannot be null");
@@ -91,11 +91,11 @@ class Order {
 
     }
 
-    void confirmPayment() {
+    public void confirmPayment() {
         transitionTo(OrderStatus.CONFIRMED);
     }
 
-    void cancel() {
+    public void cancel() {
         transitionTo(OrderStatus.CANCELLED);
     }
 

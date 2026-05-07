@@ -1,6 +1,10 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.application;
 
 import org.springframework.stereotype.Service;
+
+import com.mclavo.ecommerce.order.api.OrderRequest;
+import com.mclavo.ecommerce.order.api.OrderResponse;
+import com.mclavo.ecommerce.order.domain.Order;
 
 @Service
 public class OrderMapper {

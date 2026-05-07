@@ -1,6 +1,9 @@
-package com.mclavo.ecommerce.order;
+package com.mclavo.ecommerce.order.api;
 
 import java.math.BigDecimal;
+
+import com.mclavo.ecommerce.order.domain.OrderStatus;
+import com.mclavo.ecommerce.order.domain.PaymentMethod;
 
 public record OrderResponse(
     Integer id,
