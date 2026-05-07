@@ -1,8 +1,12 @@
-package com.mclavo.ecommerce.product;
+package com.mclavo.ecommerce.product.application;
 
 import org.springframework.stereotype.Service;
 
-import com.mclavo.ecommerce.category.Category;
+import com.mclavo.ecommerce.product.api.ProductPurchaseResponse;
+import com.mclavo.ecommerce.product.api.ProductRequest;
+import com.mclavo.ecommerce.product.api.ProductResponse;
+import com.mclavo.ecommerce.product.domain.Category;
+import com.mclavo.ecommerce.product.domain.Product;
 
 @Service
 public class ProductMapper {
@@ -18,6 +22,7 @@ public class ProductMapper {
             .description(request.description())
             .price(request.price())
             .availableQuantity(request.availableQuantity())
+            .reservedQuantity(0)
             .category(category)
             .build();
 

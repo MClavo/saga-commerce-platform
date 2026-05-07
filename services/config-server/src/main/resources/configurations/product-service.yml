@@ -18,6 +18,24 @@ spring:
     baseline-version: 0
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
-  
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "com.mclavo.ecommerce.*"
+        spring.json.type.mapping: productReservationSucceeded:com.mclavo.ecommerce.product.infrastructure.messaging.event.ProductReservationSucceededEvent,productReservationFailed:com.mclavo.ecommerce.product.infrastructure.messaging.event.ProductReservationFailedEvent
+
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: product-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.mclavo.ecommerce.*"
+   
 server:
   port: 8050

@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.product;
+package com.mclavo.ecommerce.product.api;
 
 import jakarta.validation.constraints.NotNull;
 

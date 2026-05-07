@@ -1,4 +1,4 @@
-package com.mclavo.ecommerce.product;
+package com.mclavo.ecommerce.product.api;
 
 import java.util.List;
 
@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.mclavo.ecommerce.product.application.ProductService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

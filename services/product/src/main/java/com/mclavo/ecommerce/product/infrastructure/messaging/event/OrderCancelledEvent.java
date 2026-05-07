@@ -1,0 +1,13 @@
+package com.mclavo.ecommerce.product.infrastructure.messaging.event;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record OrderCancelledEvent(
+        @NotNull(message = "Order ID is required")
+        Integer orderId,
+
+        @NotBlank(message = "Order reference is required")
+        String orderReference
+) {
+}
