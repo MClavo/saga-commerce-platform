@@ -23,9 +23,10 @@ management:
 
 application:
   kafka:
-    order-created-topic: order.created
+    product-reservation-requested-topic: product.reservation.requested
     product-reservation-succeeded-topic: product.reservation.succeeded
     product-reservation-failed-topic: product.reservation.failed
+    payment-requested-topic: payment.requested
     payment-confirmed-topic: payment.confirmed
     payment-failed-topic: payment.failed
     order-confirmed-topic: order.confirmed

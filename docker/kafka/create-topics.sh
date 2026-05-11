@@ -25,9 +25,11 @@ create_topic() {
     --replication-factor 1
 }
 
-create_topic "$ORDER_CREATED"
+
+create_topic "$PRODUCT_RESERVATION_REQUESTED"
 create_topic "$PRODUCT_RESERVATION_SUCCEEDED"
 create_topic "$PRODUCT_RESERVATION_FAILED"
+create_topic "$PAYMENT_REQUESTED"
 create_topic "$PAYMENT_CONFIRMED"
 create_topic "$PAYMENT_FAILED"
 create_topic "$ORDER_CONFIRMED"
