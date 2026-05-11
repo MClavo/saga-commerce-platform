@@ -1,24 +1,36 @@
 # Order Processing Saga
 
-This project implements an **event-driven Saga pattern** to guarantee business consistency across distributed services without distributed transactions.
+This project implements an **event-driven orchestrated Saga pattern** to guarantee business consistency across distributed services without using distributed transactions.
 
-Each service owns its own database and performs **local transactions only**. Cross-service coordination is handled asynchronously through Apache Kafka.
+Each service owns its own database and executes **local transactions only**. Cross-service coordination is handled asynchronously through Kafka.
 
-## Communication Strategy
+The **Order Service** acts as the Saga orchestrator. It owns the order lifecycle and decides the next step based on events produced by Product and Payment services.
 
-### OpenFeign (Synchronous)
+---
 
-Used only for **immediate validation or data retrieval** before an order is created.
+# Communication Strategy
+
+## Synchronous Communication — OpenFeign
+
+Used only for immediate validation before an order is created.
 
 **Order Service** performs:
-
 - Customer validation (`Customer Service`)
-- Product information retrieval (`Product Service`)
 
-### Kafka (Asynchronous)
+Order Service does **not** call Product Service synchronously to enrich order lines.
+
+Product snapshots such as:
+- Product ID
+- Product name
+- Unit price
+
+are returned by Product Service as part of the stock reservation result.
+
+---
+
+## Asynchronous Communication — Kafka
 
 Used for:
-
 - Distributed business workflows
 - State transitions
 - Compensation actions
@@ -32,149 +44,213 @@ Any operation that modifies another service's state must be event-driven.
 
 ## 1. Order Creation
 
-**Order Service**
+### :contentReference[oaicite:1]{index=1}
 
-Actions:
-
+### Actions
 - Validate customer
-- Retrieve product information
-- Create order with status `PENDING`
+- Create order with status `PRODUCT_RESERVATION_PENDING`
+- Store requested product IDs and quantities
+- Publish stock reservation request
 
-Produces:
-
-- `order.created`
+### Produces
+- `product.reservation.requested`
 
 ---
 
 ## 2. Stock Reservation
 
-**Product Service**
+### :contentReference[oaicite:2]{index=2}
 
-Consumes:
+### Consumes
+- `product.reservation.requested`
 
-- `order.created`
-
-Actions:
-
+### Actions
 - Validate inventory
 - Reserve stock
+- Resolve product snapshot data required by the order:
+  - Product ID
+  - Product name
+  - Quantity
+  - Unit price
 
-Produces:
+### Produces
 
-Success:
-
+#### Success
 - `product.reservation.succeeded`
 
-Failure:
-
+#### Failure
 - `product.reservation.failed`
+
+The success event includes the reserved product snapshots and confirmed prices.
+
+These prices become the **single source of truth** for:
+- Order total
+- Payment amount
 
 ---
 
-## 3. Payment Processing
+## 3. Product Reservation Result
 
-**Payment Service**
+### :contentReference[oaicite:3]{index=3}
 
-Consumes:
-
+### Consumes
 - `product.reservation.succeeded`
+- `product.reservation.failed`
 
-Actions:
+### On Success
 
+#### Actions
+- Store product snapshots in order lines
+- Calculate `totalAmount`
+- Update order status to `PRODUCT_RESERVED`
+- Publish payment request
+
+#### Produces
+- `payment.requested`
+
+### On Failure
+
+#### Actions
+- Update order status to `PRODUCT_RESERVATION_FAILED`
+- Publish notification request
+
+#### Produces
+- `notification.requested`
+
+---
+
+## 4. Payment Processing
+
+### :contentReference[oaicite:4]{index=4}
+
+### Consumes
+- `payment.requested`
+
+### Actions
 - Create payment
-- Process payment
+- Process payment using the amount provided by Order Service
 
-Produces:
+### Produces
 
-Success:
-
+#### Success
 - `payment.confirmed`
 
-Failure:
-
+#### Failure
 - `payment.failed`
+
+Payment Service does **not** fetch products and does **not** recalculate prices.
 
 ---
 
-## 4. Order Finalization
+## 5. Order Finalization
 
-**Order Service**
+### :contentReference[oaicite:5]{index=5}
 
-Consumes:
-
-- `product.reservation.failed`
+### Consumes
 - `payment.confirmed`
 - `payment.failed`
 
-Actions:
+### On Payment Success
 
-Success:
+#### Actions
+- Update order status to `CONFIRMED`
+- Publish order confirmation
+- Publish notification request
 
-- Update order to `CONFIRMED`
-
-Failure:
-
-- Update order to `CANCELLED`
-
-Produces:
-
-Success:
-
+#### Produces
 - `order.confirmed`
+- `notification.requested`
 
-Failure:
+### On Payment Failure
 
+#### Actions
+- Update order status to `PAYMENT_FAILED`
+- Publish cancellation event
+- Publish notification request
+
+#### Produces
 - `order.cancelled`
-
-In both cases:
-
 - `notification.requested`
 
 ---
 
-## 5. Inventory Finalization
+## 6. Inventory Finalization
 
-**Product Service**
+### :contentReference[oaicite:6]{index=6}
 
-Consumes:
-
+### Consumes
 - `order.confirmed`
 - `order.cancelled`
 
-Actions:
+### Actions
 
-- Commit reserved stock on success
-- Release reserved stock on cancellation
+#### On Confirmation
+- Commit reserved stock
+
+#### On Cancellation
+- Release reserved stock
 
 ---
 
-## 6. Notification
+## 7. Notification
 
-**Notification Service**
+### :contentReference[oaicite:7]{index=7}
 
-Consumes:
-
+### Consumes
 - `notification.requested`
 
-Actions:
-
+### Actions
 - Persist notification
 - Send email/message
+
+---
+
+# Kafka Topics
+
+## Produced by Order Service
+- `product.reservation.requested`
+- `payment.requested`
+- `order.confirmed`
+- `order.cancelled`
+- `notification.requested`
+
+## Produced by Product Service
+- `product.reservation.succeeded`
+- `product.reservation.failed`
+
+## Produced by Payment Service
+- `payment.confirmed`
+- `payment.failed`
+
+---
+
+# Order Statuses
+
+```java
+enum OrderStatus {
+    PRODUCT_RESERVATION_PENDING,
+    PRODUCT_RESERVED,
+    CONFIRMED,
+    PRODUCT_RESERVATION_FAILED,
+    PAYMENT_FAILED
+}
+```
 
 ---
 
 # Service Event Matrix
 
 | Service | Consumes | Action | Produces |
-|---|---|---|---|
-| Order Service | HTTP Request | Validate customer, retrieve product data, create `PENDING` order | `order.created` |
-| Product Service | `order.created` | Reserve stock | `product.reservation.succeeded` / `product.reservation.failed` |
-| Payment Service | `product.reservation.succeeded` | Process payment | `payment.confirmed` / `payment.failed` |
-| Order Service | `product.reservation.failed` | Cancel order | `order.cancelled`, `notification.requested` |
+|---------|----------|--------|----------|
+| Order Service | HTTP Request | Validate customer, create order | `product.reservation.requested` |
+| Product Service | `product.reservation.requested` | Reserve stock | `product.reservation.succeeded`, `product.reservation.failed` |
+| Order Service | `product.reservation.succeeded` | Store snapshots, calculate total, set `PRODUCT_RESERVED` | `payment.requested` |
+| Order Service | `product.reservation.failed` | Set `PRODUCT_RESERVATION_FAILED` | `notification.requested` |
+| Payment Service | `payment.requested` | Process payment | `payment.confirmed`, `payment.failed` |
 | Order Service | `payment.confirmed` | Confirm order | `order.confirmed`, `notification.requested` |
-| Order Service | `payment.failed` | Cancel order | `order.cancelled`, `notification.requested` |
-| Product Service | `order.confirmed` | Commit reserved stock | — |
-| Product Service | `order.cancelled` | Release reserved stock | — |
+| Order Service | `payment.failed` | Set `PAYMENT_FAILED` | `order.cancelled`, `notification.requested` |
+| Product Service | `order.confirmed` | Commit stock | — |
+| Product Service | `order.cancelled` | Release stock | — |
 | Notification Service | `notification.requested` | Persist and send notification | — |
 
 ---
@@ -184,23 +260,25 @@ Actions:
 ## Stock Reservation Failure
 
 ```text
-order.created
+product.reservation.requested
     ↓
 product.reservation.failed
-    ↓
-order.cancelled
     ↓
 notification.requested
 ```
 
 Payment is never triggered.
 
+---
+
 ## Payment Failure
 
 ```text
-order.created
+product.reservation.requested
     ↓
 product.reservation.succeeded
+    ↓
+payment.requested
     ↓
 payment.failed
     ↓
@@ -208,7 +286,7 @@ order.cancelled
     ↓
 notification.requested
     ↓
-stock released
+stock released by Product Service
 ```
 
 ---
@@ -216,9 +294,26 @@ stock released
 # Design Principles
 
 - No distributed transactions
-- No synchronous business chaining
+- Order Service orchestrates the Saga
+- No synchronous product enrichment from Order Service
+- No N+1 remote product lookups
+- Product Service owns stock validation and product price snapshots
+- Order Service owns order lifecycle and total calculation
+- Payment Service processes only the provided amount
 - Event-driven state transitions
-- Explicit compensation actions
+- Explicit compensation through `order.cancelled`
 - Eventual consistency
 - Idempotent consumers
-- Domain events represent business facts, not technical commands
+- Domain events represent meaningful business transitions
+
+---
+
+# Design Decision
+
+`order.cancelled` exists as an **integration event**, not necessarily as an internal order status.
+
+Internal state remains explicit:
+- `PRODUCT_RESERVATION_FAILED`
+- `PAYMENT_FAILED`
+
+This preserves failure semantics inside the Order aggregate while still exposing a clear compensation event to external services.

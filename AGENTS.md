@@ -30,27 +30,42 @@
 
 ## Kafka
 - Kafka topics are provisioned as infrastructure through Docker Compose (`kafka-init` + `create-topics.sh` + `topics.env`); broker auto-topic creation is disabled and `NewTopic` beans are intentionally avoided.
-- Current saga topics are: `order.created`, `product.reservation.succeeded`, `product.reservation.failed`, `payment.confirmed`, `payment.failed`, `order.confirmed`, `order.cancelled`, and `notification.requested`.
+- Current saga topics are: `product.reservation.requested`, `product.reservation.succeeded`, `product.reservation.failed`, `payment.requested`, `payment.confirmed`, `payment.failed`, `order.confirmed`, `order.cancelled`, and `notification.requested`.
+- Order Service produces `product.reservation.requested`, `payment.requested`, `order.confirmed`, `order.cancelled`, and `notification.requested`.
+- Product Service produces `product.reservation.succeeded` and `product.reservation.failed`.
+- Payment Service produces `payment.confirmed` and `payment.failed`.
 - Event records are duplicated per service instead of using a shared contracts module; keep schemas, serialization settings, and Kafka JSON type mappings aligned across services.
 
 ## Flow
 - The authoritative Saga documentation lives in `docs/order-processing-saga.md`; always follow that file before changing the order workflow.
+- This Saga is event-driven but orchestrated by Order Service, not choreography-based.
+- Order Service owns the order lifecycle and decides the next step based on Product and Payment events.
 - Order Service uses OpenFeign only for synchronous pre-validation:
   - Validate customer through Customer Service
-  - Retrieve product information through Product Service
-- After validation, Order Service creates the order with `PENDING` status and publishes `order.created`.
-- Product Service consumes `order.created`, reserves stock, then publishes:
+- Order Service must not call Product Service synchronously to enrich order lines or retrieve product data.
+- After customer validation, Order Service creates the order with `PRODUCT_RESERVATION_PENDING` status, stores requested product IDs and quantities, then publishes `product.reservation.requested`.
+- Product Service consumes `product.reservation.requested`, validates inventory, reserves stock, resolves product snapshot data, then publishes:
   - `product.reservation.succeeded`, or
   - `product.reservation.failed`
-- Payment Service consumes only `product.reservation.succeeded` (never `order.created`), processes payment, then publishes:
+- `product.reservation.succeeded` must include the reserved product snapshots and confirmed prices; those prices are the source of truth for order total and payment amount.
+- Order Service consumes `product.reservation.succeeded`, stores product snapshots in order lines, calculates `totalAmount`, updates order status to `PRODUCT_RESERVED`, then publishes `payment.requested`.
+- Order Service consumes `product.reservation.failed`, updates order status to `PRODUCT_RESERVATION_FAILED`, then publishes `notification.requested`.
+- Payment Service consumes only `payment.requested`, creates/processes the payment using the amount provided by Order Service, then publishes:
   - `payment.confirmed`, or
   - `payment.failed`
-- Order Service consumes reservation/payment outcomes, updates order state (`CONFIRMED` or `CANCELLED`), then publishes:
-  - `order.confirmed` or `order.cancelled`
+- Payment Service must not fetch products and must not recalculate prices.
+- Order Service consumes `payment.confirmed`, updates order status to `CONFIRMED`, then publishes:
+  - `order.confirmed`
   - `notification.requested`
-- Product Service consumes final order events to commit or release reserved stock.
+- Order Service consumes `payment.failed`, updates order status to `PAYMENT_FAILED`, then publishes:
+  - `order.cancelled`
+  - `notification.requested`
+- Product Service consumes final order events:
+  - `order.confirmed` commits reserved stock
+  - `order.cancelled` releases reserved stock
 - Notification Service consumes only `notification.requested`, stores Mongo `Notification`, and sends email through MailDev.
-- This Saga is choreography-based, event-driven, and uses explicit compensation actions. Do not reintroduce synchronous business chaining between Order and Payment.
+- `order.cancelled` is an integration event for compensation, not necessarily an internal Order status.
+- Do not reintroduce synchronous business chaining between Order, Product, and Payment.
 
 ## Code Notes
 - Order Feign clients use service names and paths in annotations; `application.client.*` URLs in config are not currently wired into those clients.
