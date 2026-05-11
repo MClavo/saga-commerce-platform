@@ -1,11 +1,10 @@
 package com.mclavo.ecommerce.product.infrastructure.messaging.event;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 public record ProductReservationSucceededEvent(
         Integer orderId,
         String orderReference,
-        BigDecimal totalAmount,
-        String paymentMethod
+        List<ProductReservationItem> products
 ) {
 }

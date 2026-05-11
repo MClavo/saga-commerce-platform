@@ -30,8 +30,8 @@ import com.mclavo.ecommerce.product.application.ProductMapper;
 import com.mclavo.ecommerce.product.application.ProductService;
 import com.mclavo.ecommerce.product.domain.Product;
 import com.mclavo.ecommerce.product.domain.ProductReservationStatus;
-import com.mclavo.ecommerce.product.infrastructure.messaging.event.OrderCreatedEvent;
 import com.mclavo.ecommerce.product.infrastructure.messaging.event.OrderProductItem;
+import com.mclavo.ecommerce.product.infrastructure.messaging.event.ProductReservationRequestedEvent;
 import com.mclavo.ecommerce.product.infrastructure.persistence.ProductRepository;
 import com.mclavo.ecommerce.product.infrastructure.persistence.ProductReservationRepository;
 
@@ -81,8 +81,8 @@ class ProductServiceStockReservationConcurrencyTest {
                 .price(new BigDecimal("18.99"))
                 .build());
 
-        var firstOrder = orderCreatedEvent(1, "ORD-1", product.getId(), 7);
-        var secondOrder = orderCreatedEvent(2, "ORD-2", product.getId(), 7);
+        var firstOrder = productReservationRequestedEvent(1, "ORD-1", product.getId(), 7);
+        var secondOrder = productReservationRequestedEvent(2, "ORD-2", product.getId(), 7);
 
         // The first latch waits until both threads are ready.
         // The second latch releases both threads at almost the same time.
@@ -147,14 +147,14 @@ class ProductServiceStockReservationConcurrencyTest {
      * 
      * @param ready Latch to signal when the thread is ready to start.
      * @param start Latch to wait for the signal to start the reservation attempt.
-     * @param event The order created event to use for the reservation attempt.
+     * @param event Product reservation request to use for the reservation attempt.
      * @return A ReservationAttempt indicating whether the reservation succeeded or
      *         failed with an exception.
      */
     private ReservationAttempt reserveAfterStart(
             CountDownLatch ready,
             CountDownLatch start,
-            OrderCreatedEvent event) {
+            ProductReservationRequestedEvent event) {
 
         ready.countDown();
         try {
@@ -174,17 +174,15 @@ class ProductServiceStockReservationConcurrencyTest {
         }
     }
 
-    private OrderCreatedEvent orderCreatedEvent(
+    private ProductReservationRequestedEvent productReservationRequestedEvent(
             Integer orderId,
             String orderReference,
             Integer productId,
             Integer quantity) {
-                
-        return new OrderCreatedEvent(
+                 
+        return new ProductReservationRequestedEvent(
                 orderId,
                 orderReference,
-                new BigDecimal("99.90"),
-                "CREDIT_CARD",
                 List.of(new OrderProductItem(productId, quantity)));
     }
 

@@ -20,8 +20,9 @@ import com.mclavo.ecommerce.product.domain.ProductReservation;
 import com.mclavo.ecommerce.product.domain.ProductReservationStatus;
 import com.mclavo.ecommerce.product.infrastructure.messaging.event.OrderCancelledEvent;
 import com.mclavo.ecommerce.product.infrastructure.messaging.event.OrderConfirmedEvent;
-import com.mclavo.ecommerce.product.infrastructure.messaging.event.OrderCreatedEvent;
 import com.mclavo.ecommerce.product.infrastructure.messaging.event.OrderProductItem;
+import com.mclavo.ecommerce.product.infrastructure.messaging.event.ProductReservationItem;
+import com.mclavo.ecommerce.product.infrastructure.messaging.event.ProductReservationRequestedEvent;
 import com.mclavo.ecommerce.product.infrastructure.messaging.event.ProductReservationSucceededEvent;
 import com.mclavo.ecommerce.product.infrastructure.persistence.ProductRepository;
 import com.mclavo.ecommerce.product.infrastructure.persistence.ProductReservationRepository;
@@ -32,46 +33,46 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    
+
     private final ProductRepository productRepository;
     private final ProductReservationRepository reservationRepository;
     private final ProductMapper productMapper;
-    
+
     @Transactional
     public Integer createProduct(ProductRequest request) {
         Product product = productMapper.toProduct(request);
         return productRepository.save(product).getId();
     }
-    
+
     @Transactional(readOnly = true)
     public ProductResponse findByID(Integer productId) {
         return productRepository.findById(productId)
-        .map(productMapper::toProductResponse)
-        .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+                .map(productMapper::toProductResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
     }
-    
+
     @Transactional(readOnly = true)
     public List<ProductResponse> findAll() {
         return productRepository.findAll().stream()
-            .map(productMapper::toProductResponse)
-            .toList();
+                .map(productMapper::toProductResponse)
+                .toList();
     }
 
     @Transactional
     public List<ProductPurchaseResponse> purchaseProducts(List<ProductPurchaseRequest> request) {
         var productIds = request.stream()
-            .map(ProductPurchaseRequest::productId)
-            .toList();
+                .map(ProductPurchaseRequest::productId)
+                .toList();
 
         var storedProducts = productRepository.findAllByIdInOrderByIdForUpdate(productIds);
         if (storedProducts.size() != productIds.size()) {
             throw new ProductPurchaseException("One or more products not found");
         }
-        
+
         var storedRequest = request.stream()
-            .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
-            .toList();
-        
+                .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
+                .toList();
+
         var purchasedProducts = new ArrayList<ProductPurchaseResponse>();
 
         for (int i = 0; i < storedProducts.size(); i++) {
@@ -89,9 +90,11 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductReservationSucceededEvent reserveStock(OrderCreatedEvent event) {
-        if (reservationRepository.existsByOrderId(event.orderId())) {
-            return toReservationSucceededEvent(event);
+    public ProductReservationSucceededEvent reserveStock(ProductReservationRequestedEvent event) {
+        var existingReservation = reservationRepository.findByOrderIdOrderByProductId(event.orderId());
+
+        if (!existingReservation.isEmpty()) {
+            return toReservationSucceededEvent(existingReservation);
         }
 
         var quantitiesByProductId = quantitiesByProductId(event.products());
@@ -104,10 +107,14 @@ public class ProductService {
             throw new ProductPurchaseException("One or more products not found");
         }
 
+        var reservations = new ArrayList<ProductReservation>();
+
         for (Product product : products) {
             Integer quantity = quantitiesByProductId.get(product.getId());
+
             product.reserveStock(quantity);
-            reservationRepository.save(ProductReservation.builder()
+
+            reservations.add(ProductReservation.builder()
                     .orderId(event.orderId())
                     .orderReference(event.orderReference())
                     .productId(product.getId())
@@ -116,7 +123,9 @@ public class ProductService {
                     .build());
         }
 
-        return toReservationSucceededEvent(event);
+        reservationRepository.saveAll(reservations);
+
+        return toReservationSucceededEvent(event, products);
     }
 
     @Transactional
@@ -137,16 +146,58 @@ public class ProductService {
                         Integer::sum));
     }
 
-    private ProductReservationSucceededEvent toReservationSucceededEvent(OrderCreatedEvent event) {
+    private ProductReservationSucceededEvent toReservationSucceededEvent(List<ProductReservation> reservations) {
+        var reservationsByProductId = reservations.stream()
+                .collect(Collectors.toMap(
+                        ProductReservation::getProductId,
+                        Function.identity()));
+
+        var productIds = reservationsByProductId.keySet().stream()
+                .sorted()
+                .toList();
+
+        var products = productRepository.findAllByIdInOrderByIdForUpdate(productIds);
+
+        // Create reservation items with the quantity from the reservation to avoid inconsistencies
+        var reservationItems = products.stream()
+                .map(product -> {
+                    ProductReservation reservation = reservationsByProductId.get(product.getId());
+                    return new ProductReservationItem(
+                            product.getId(),
+                            product.getName(),
+                            reservation.getQuantity(),
+                            product.getPrice());
+                })
+                .toList();
+
+        ProductReservation firstReservation = reservations.getFirst();
+        return new ProductReservationSucceededEvent(
+                firstReservation.getOrderId(),
+                firstReservation.getOrderReference(),
+                reservationItems);
+    }
+
+    private ProductReservationSucceededEvent toReservationSucceededEvent(
+            ProductReservationRequestedEvent event,
+            List<Product> products) {
+
+        var quantitiesByProductId = quantitiesByProductId(event.products());
+        var reservationItems = products.stream()
+                .map(product -> new ProductReservationItem(
+                        product.getId(),
+                        product.getName(),
+                        quantitiesByProductId.get(product.getId()),
+                        product.getPrice()))
+                .toList();
+
         return new ProductReservationSucceededEvent(
                 event.orderId(),
                 event.orderReference(),
-                event.totalAmount(),
-                event.paymentMethod());
+                reservationItems);
     }
 
     private void finalizeReservedStock(Integer orderId, StockFinalization finalization) {
-        var reservations = reservationRepository.findByOrderId(orderId).stream()
+        var reservations = reservationRepository.findByOrderIdOrderByProductId(orderId).stream()
                 .filter(ProductReservation::isReserved)
                 .toList();
         if (reservations.isEmpty()) {
