@@ -18,7 +18,17 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.trusted.packages: "com.mclavo.ecommerce.*"
-        spring.json.add.type.mapping: orderConfirmation:com.mclavo.ecommerce.order.orderConfirmation
+        spring.json.type.mapping: orderCreated:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderCreatedEvent,orderConfirmed:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderConfirmedEvent,orderCancelled:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderCancelledEvent,notificationRequested:com.mclavo.ecommerce.order.infrastructure.messaging.event.NotificationRequestedEvent
+
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: order-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.mclavo.ecommerce.*"
+        spring.json.type.mapping: productReservationFailed:com.mclavo.ecommerce.order.infrastructure.messaging.event.ProductReservationFailedEvent,paymentConfirmed:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentConfirmedEvent,paymentFailed:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentFailedEvent
 
 server:
   port: 8070
@@ -27,8 +37,4 @@ application:
   client:
     customer-url: http://localhost:8222/api/v1/customers
     product-url: http://localhost:8222/api/v1/products
-    payment-url: http://localhost:8222/api/v1/payments
-    
-  kafka:
-    order-topic: order-confirmation
   
