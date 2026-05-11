@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "application.kafka")
 public record KafkaPaymentProperties(
-    String productReservationSucceededTopic,
+    String paymentRequestedTopic,
     String paymentConfirmedTopic,
     String paymentFailedTopic
 ) {}

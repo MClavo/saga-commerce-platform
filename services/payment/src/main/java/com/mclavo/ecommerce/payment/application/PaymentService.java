@@ -7,7 +7,7 @@ import com.mclavo.ecommerce.payment.api.PaymentRequest;
 import com.mclavo.ecommerce.payment.infrastucture.gateway.PaymentGateway;
 import com.mclavo.ecommerce.payment.infrastucture.messaging.PaymentEventProducer;
 import com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentConfirmedEvent;
-import com.mclavo.ecommerce.payment.infrastucture.messaging.event.ProductReservationSucceededEvent;
+import com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentRequestedEvent;
 import com.mclavo.ecommerce.payment.infrastucture.persistence.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void processProductReservationSucceeded(ProductReservationSucceededEvent event) {
+    public void processPaymentRequested(PaymentRequestedEvent event) {
         String paymentReference = paymentGateway.process(event);
 
         paymentRepository.save(paymentMapper.toPayment(event, paymentReference));

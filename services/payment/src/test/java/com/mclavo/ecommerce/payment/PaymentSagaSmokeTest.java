@@ -24,15 +24,15 @@ import com.mclavo.ecommerce.payment.domain.PaymentMethod;
 import com.mclavo.ecommerce.payment.infrastucture.gateway.PaymentGateway;
 import com.mclavo.ecommerce.payment.infrastucture.gateway.StubPaymentGateway;
 import com.mclavo.ecommerce.payment.infrastucture.messaging.PaymentEventProducer;
-import com.mclavo.ecommerce.payment.infrastucture.messaging.ProductReservationSucceededConsumer;
 import com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentConfirmedEvent;
-import com.mclavo.ecommerce.payment.infrastucture.messaging.event.ProductReservationSucceededEvent;
+import com.mclavo.ecommerce.payment.infrastucture.messaging.PaymentRequestedConsumer;
+import com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentRequestedEvent;
 import com.mclavo.ecommerce.payment.infrastucture.persistence.PaymentRepository;
 
 import jakarta.annotation.Resource;
 
 @SpringBootTest(classes = {
-        ProductReservationSucceededConsumer.class,
+        PaymentRequestedConsumer.class,
         PaymentService.class,
         PaymentMapper.class,
         PaymentEventProducer.class,
@@ -41,7 +41,7 @@ import jakarta.annotation.Resource;
 class PaymentSagaSmokeTest {
 
     @Resource
-    private ProductReservationSucceededConsumer consumer;
+    private PaymentRequestedConsumer consumer;
 
     @Resource
     private PaymentRepository paymentRepository;
@@ -50,13 +50,13 @@ class PaymentSagaSmokeTest {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Test
-    void should_Process_Payment_And_PublishEvent_when_ProductReservationSucceededEvent_Consumed() {
+    void should_Process_Payment_And_PublishEvent_when_PaymentRequestedEvent_Consumed() {
         
         // given
         when(paymentRepository.save(any(Payment.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        var event = new ProductReservationSucceededEvent(
+        var event = new PaymentRequestedEvent(
                 42,
                 "ORD-42",
                 new BigDecimal("99.90"),
@@ -89,7 +89,7 @@ class PaymentSagaSmokeTest {
         @Bean
         KafkaPaymentProperties kafkaPaymentProperties() {
             return new KafkaPaymentProperties(
-                    "product.reservation.succeeded",
+                    "payment.requested",
                     "payment.confirmed",
                     "payment.failed");
         }
