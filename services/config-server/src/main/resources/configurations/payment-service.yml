@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/payment
-    username: postgres
-    password: postgres
+    url: ${PAYMENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/payment}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -13,7 +13,7 @@ spring:
 
   kafka:
     producer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
@@ -21,7 +21,7 @@ spring:
         spring.json.type.mapping: paymentConfirmed:com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentConfirmedEvent,paymentFailed:com.mclavo.ecommerce.payment.infrastucture.messaging.event.PaymentFailedEvent
 
     consumer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
       group-id: payment-service
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
