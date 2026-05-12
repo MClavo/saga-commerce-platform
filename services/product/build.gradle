@@ -42,6 +42,8 @@ dependencies {
   implementation 'io.micrometer:micrometer-tracing-bridge-brave'
   implementation 'org.flywaydb:flyway-database-postgresql'
   implementation 'org.springframework.cloud:spring-cloud-starter-config'
+  implementation 'org.springframework.retry:spring-retry'
+  implementation 'org.springframework.boot:spring-boot-starter-aspectj'
   implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
   compileOnly 'org.projectlombok:lombok'
   runtimeOnly 'org.postgresql:postgresql'
