@@ -1,0 +1,32 @@
+plugins {
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+
+repositories {
+	mavenCentral()
+}
+
+subprojects {
+    plugins.withId('org.springframework.boot') {
+        bootBuildImage {
+            builder = "paketobuildpacks/builder-noble-java-tiny"
+            imageName = "ecommerce/${project.name}:local-ecommerce"
+            environment = [
+                "BP_JVM_VERSION": "21",
+                "BP_JVM_TYPE": "JRE"
+            ]
+        }
+    }
+	
+	tasks.withType(Test).configureEach {
+        maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+        useJUnitPlatform()
+            testLogging {
+                events "failed"
+                exceptionFormat "full"
+            }
+    }
+}
