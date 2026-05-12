@@ -6,8 +6,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import com.mclavo.ecommerce.email.EmailService;
-import com.mclavo.ecommerce.order.OrderConfirmation;
-import com.mclavo.ecommerce.payment.PaymentConfirmation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,68 +14,24 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationConsumer {
-    
+
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
 
-    @KafkaListener(
-        topics = "${application.kafka.payment-topic}",
-        groupId = "paymentGroup",
-        properties = {
-                "spring.json.use.type.headers=false",
-                "spring.json.value.default.type=com.mclavo.ecommerce.payment.PaymentConfirmation"
+    @KafkaListener(topics = "${application.kafka.notification-requested-topic}")
+    public void consume(NotificationRequestedEvent event) {
+        log.info("Consuming notification requested event for order reference: {}", event.orderReference());
+
+        notificationRepository.save(Notification.from(event, LocalDateTime.now()));
+
+        try {
+            emailService.sendNotificationEmail(event);
+        } catch (RuntimeException e) {
+            log.warn(
+                    "Notification email failed for order reference {} and type {}: {}",
+                    event.orderReference(),
+                    event.notificationType(),
+                    e.getMessage());
         }
-    )
-    public void consumePaymentSuccessNotification(PaymentConfirmation paymentConfirmation) {
-        log.info("Consuming payment confirmation: {}", paymentConfirmation);
-
-        notificationRepository.save(
-            Notification.builder()
-                .type(NotificationType.PAYMENT_CONFIRMATION)
-                .notificationDate(LocalDateTime.now())
-                .paymentConfirmation(paymentConfirmation)
-                .build()
-        );
-
-        // Send email
-        String name = paymentConfirmation.customerFirstname() + " " + paymentConfirmation.customerLastname();
-
-        emailService.sendPaymentSuccessEmail(
-            paymentConfirmation.customerEmail(),
-            name,
-            paymentConfirmation.amount(),
-            paymentConfirmation.orderReference()
-        );
     }
-
-    @KafkaListener(
-        topics = "${application.kafka.order-topic}",
-        groupId = "orderGroup",
-        properties = {
-                "spring.json.use.type.headers=false",
-                "spring.json.value.default.type=com.mclavo.ecommerce.order.OrderConfirmation"
-        }
-    )
-    public void consumeOrderNotification(OrderConfirmation orderConfirmation) {
-        log.info("Consuming order confirmation: {}", orderConfirmation);
-
-        notificationRepository.save(
-            Notification.builder()
-                .type(NotificationType.ORDER_CONFIRMATION)
-                .notificationDate(LocalDateTime.now())
-                .orderConfirmation(orderConfirmation)
-                .build()
-        );
-
-        // Send email
-        String name = orderConfirmation.customer().firstname() + " " + orderConfirmation.customer().lastname();
-        emailService.sendOrderConfirmationEmail(
-            orderConfirmation.customer().email(),
-            name,
-            orderConfirmation.totalAmount(),
-            orderConfirmation.orderReference(),
-            orderConfirmation.products()
-        );
-    }
-    
 }

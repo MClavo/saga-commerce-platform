@@ -3,8 +3,9 @@ package com.mclavo.ecommerce.email;
 import lombok.Getter;
 
 public enum EmailTemplate {
-    PAYMENT_CONFIRMATION("payment-confirmation.html", "Payment successfully processed"),
-    ORDER_CONFIRMATION("order-confirmation.html", "Order confirmation");
+    ORDER_CONFIRMED("order-confirmation.html", "Order confirmation"),
+    PAYMENT_FAILED("payment-failed.html", "Payment failed"),
+    PRODUCT_RESERVATION_FAILED("product-reservation-failed.html", "Product reservation failed");
 
 
     @Getter

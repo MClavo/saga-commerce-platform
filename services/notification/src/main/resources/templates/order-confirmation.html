@@ -56,23 +56,27 @@
 
   <body>
   <div class="container">
-    <h1>Order Details</h1>
+    <h1>Order Confirmed</h1>
     <p>Customer: <span th:text="${customerName}"></span></p>
-    <p>Order ID: <span th:text="${orderReference}"></span></p>
+    <p>Order reference: <span th:text="${orderReference}"></span></p>
+    <p>Payment method: <span th:text="${paymentMethod}"></span></p>
+    <p>Payment reference: <span th:text="${paymentReference}"></span></p>
 
     <table>
       <thead>
       <tr>
         <th>Product Name</th>
         <th>Quantity</th>
-        <th>Price</th>
+        <th>Unit Price</th>
+        <th>Subtotal</th>
       </tr>
       </thead>
       <tbody>
       <tr th:each="product : ${products}">
-        <td th:text="${product.name}"></td>
+        <td th:text="${product.productName}"></td>
         <td th:text="${product.quantity}"></td>
-        <td th:text="${product.price}"></td>
+        <td th:text="${product.unitPrice}"></td>
+        <td th:text="${product.subtotal}"></td>
       </tr>
       </tbody>
     </table>

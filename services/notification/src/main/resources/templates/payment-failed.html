@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Failed</title>
+  </head>
+  <body>
+    <h1>Payment Failed</h1>
+    <p>Dear <span th:text="${customerName}"></span>,</p>
+    <p>Your payment for order <span th:text="${orderReference}"></span> could not be processed.</p>
+    <p>Reason: <span th:text="${failureReason}"></span></p>
+    <p>Total amount: $<span th:text="${totalAmount}"></span></p>
+    <p>Payment method: <span th:text="${paymentMethod}"></span></p>
+    <p>This is an automated message. Please do not reply to this email.</p>
+  </body>
+</html>

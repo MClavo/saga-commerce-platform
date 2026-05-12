@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Reservation Failed</title>
+  </head>
+  <body>
+    <h1>Order Cannot Be Completed</h1>
+    <p>Dear <span th:text="${customerName}"></span>,</p>
+    <p>Order <span th:text="${orderReference}"></span> cannot continue because product reservation failed.</p>
+    <p>Reason: <span th:text="${failureReason}"></span></p>
+    <p>This is an automated message. Please do not reply to this email.</p>
+  </body>
+</html>
