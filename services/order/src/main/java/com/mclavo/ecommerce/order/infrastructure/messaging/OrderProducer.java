@@ -1,13 +1,14 @@
 package com.mclavo.ecommerce.order.infrastructure.messaging;
 
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import com.mclavo.ecommerce.config.KafkaOrderProperties;
-import com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderConfirmation;
+import com.mclavo.ecommerce.order.infrastructure.messaging.event.NotificationRequestedEvent;
+import com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderCancelledEvent;
+import com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderConfirmedEvent;
+import com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentRequestedEvent;
+import com.mclavo.ecommerce.order.infrastructure.messaging.event.ProductReservationRequestedEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +19,30 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderProducer {
 
     private final KafkaOrderProperties kafkaProperties;
-    private final KafkaTemplate<String, OrderConfirmation> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishOrderConfirmation(OrderConfirmation orderConfirmation) {
-        log.info("Sending order confirmation for order reference: {}", orderConfirmation.orderReference());
-        Message<OrderConfirmation> message = MessageBuilder
-                .withPayload(orderConfirmation)
-                .setHeader(KafkaHeaders.TOPIC, kafkaProperties.orderTopic())
-                .build();
+    public void publishProductReservationRequested(ProductReservationRequestedEvent event) {
+        log.info("Publishing product reservation requested event for order reference: {}", event.orderReference());
+        kafkaTemplate.send(kafkaProperties.productReservationRequestedTopic(), event.orderReference(), event);
+    }
 
-        kafkaTemplate.send(message);
+    public void publishPaymentRequested(PaymentRequestedEvent event) {
+        log.info("Publishing payment requested event for order reference: {}", event.orderReference());
+        kafkaTemplate.send(kafkaProperties.paymentRequestedTopic(), event.orderReference(), event);
+    }
+
+    public void publishOrderConfirmed(OrderConfirmedEvent event) {
+        log.info("Publishing order confirmed event for order reference: {}", event.orderReference());
+        kafkaTemplate.send(kafkaProperties.orderConfirmedTopic(), event.orderReference(), event);
+    }
+
+    public void publishOrderCancelled(OrderCancelledEvent event) {
+        log.info("Publishing order cancelled event for order reference: {}", event.orderReference());
+        kafkaTemplate.send(kafkaProperties.orderCancelledTopic(), event.orderReference(), event);
+    }
+
+    public void publishNotificationRequested(NotificationRequestedEvent event) {
+        log.info("Publishing notification requested event for order reference: {}", event.orderReference());
+        kafkaTemplate.send(kafkaProperties.notificationRequestedTopic(), event.orderReference(), event);
     }
 }

@@ -18,7 +18,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.trusted.packages: "com.mclavo.ecommerce.*"
-        spring.json.type.mapping: orderCreated:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderCreatedEvent,orderConfirmed:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderConfirmedEvent,orderCancelled:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderCancelledEvent,notificationRequested:com.mclavo.ecommerce.order.infrastructure.messaging.event.NotificationRequestedEvent
+        spring.json.type.mapping: productReservationRequested:com.mclavo.ecommerce.order.infrastructure.messaging.event.ProductReservationRequestedEvent,paymentRequested:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentRequestedEvent,orderConfirmed:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderConfirmedEvent,orderCancelled:com.mclavo.ecommerce.order.infrastructure.messaging.event.OrderCancelledEvent,notificationRequested:com.mclavo.ecommerce.order.infrastructure.messaging.event.NotificationRequestedEvent
 
     consumer:
       bootstrap-servers: localhost:9092
@@ -28,7 +28,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "com.mclavo.ecommerce.*"
-        spring.json.type.mapping: productReservationFailed:com.mclavo.ecommerce.order.infrastructure.messaging.event.ProductReservationFailedEvent,paymentConfirmed:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentConfirmedEvent,paymentFailed:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentFailedEvent
+        spring.json.type.mapping: productReservationSucceeded:com.mclavo.ecommerce.order.infrastructure.messaging.event.ProductReservationSucceededEvent,productReservationFailed:com.mclavo.ecommerce.order.infrastructure.messaging.event.ProductReservationFailedEvent,paymentConfirmed:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentConfirmedEvent,paymentFailed:com.mclavo.ecommerce.order.infrastructure.messaging.event.PaymentFailedEvent
 
 server:
   port: 8070
@@ -36,5 +36,4 @@ server:
 application:
   client:
     customer-url: http://localhost:8222/api/v1/customers
-    product-url: http://localhost:8222/api/v1/products
   

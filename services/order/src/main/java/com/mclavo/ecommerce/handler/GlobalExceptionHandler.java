@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.mclavo.ecommerce.exception.BusinessException;
+import com.mclavo.ecommerce.exception.DuplicateOrderReferenceException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -21,6 +22,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(BusinessException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateOrderReferenceException.class)
+    public ResponseEntity<String> handle(DuplicateOrderReferenceException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(exception.getMessage());
     }
 

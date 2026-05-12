@@ -12,9 +12,10 @@ import com.mclavo.ecommerce.order.domain.OrderLine;
 public interface OrderLineRepository extends JpaRepository<OrderLine, Integer> {
 
     @Query("""
-        SELECT new com.mclavo.ecommerce.order.OrderLineResponse(
+        SELECT new com.mclavo.ecommerce.order.api.OrderLineResponse(
             ol.id,
             ol.productId,
+            ol.productName,
             ol.quantity,
             ol.unitPrice
         )

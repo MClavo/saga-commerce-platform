@@ -2,6 +2,7 @@ package com.mclavo.ecommerce.order.api;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +24,13 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Integer> createOrder(
+    public ResponseEntity<OrderCreationResponse> createOrder(
             @RequestBody @Valid OrderRequest request) {
-        return ResponseEntity.ok(orderService.createOrder(request));
+        OrderCreationResponse response = orderService.createOrder(request);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .header("Location", "/api/v1/orders/" + response.orderId())
+                .body(response);
     }
 
     @GetMapping
