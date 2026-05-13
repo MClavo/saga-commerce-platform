@@ -1,5 +1,6 @@
 package com.mclavo.ecommerce.product;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -61,5 +62,71 @@ class ProductTest {
 
         assertEquals(10, product.getAvailableQuantity());
         assertEquals(0, product.getReservedQuantity());
+    }
+
+    @Test
+    void should_Increase_Available_Stock_when_Positive_Delta_Is_Applied() {
+
+        // given
+        Product product = Product.builder()
+                .id(1)
+                .availableQuantity(7)
+                .reservedQuantity(3)
+                .build();
+
+        // when
+        product.adjustAvailableStock(5);
+
+        // then
+        assertAll(
+                () -> assertEquals(12, product.getAvailableQuantity()),
+                () -> assertEquals(3, product.getReservedQuantity()));
+    }
+
+    @Test
+    void should_Decrease_Available_Stock_when_Negative_Delta_Is_Applied() {
+
+        // given
+        Product product = Product.builder()
+                .id(1)
+                .availableQuantity(7)
+                .reservedQuantity(3)
+                .build();
+
+        // when
+        product.adjustAvailableStock(-4);
+
+        // then
+        assertAll(
+                () -> assertEquals(3, product.getAvailableQuantity()),
+                () -> assertEquals(3, product.getReservedQuantity()));
+    }
+
+    @Test
+    void should_Reject_Stock_Adjustment_when_Delta_Is_Zero() {
+
+        // given
+        Product product = Product.builder()
+                .id(1)
+                .availableQuantity(7)
+                .reservedQuantity(3)
+                .build();
+
+        // when / then
+        assertThrows(ProductPurchaseException.class, () -> product.adjustAvailableStock(0));
+    }
+
+    @Test
+    void should_Reject_Stock_Adjustment_when_Available_Stock_Would_Be_Negative() {
+
+        // given
+        Product product = Product.builder()
+                .id(1)
+                .availableQuantity(7)
+                .reservedQuantity(3)
+                .build();
+
+        // when / then
+        assertThrows(ProductPurchaseException.class, () -> product.adjustAvailableStock(-8));
     }
 }

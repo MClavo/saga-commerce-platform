@@ -6,6 +6,7 @@ spring:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   cloud:
     config:
+      enabled: ${CONFIG_ENABLED:false}
       fail-fast: true
       retry:
         initial-interval: 2000

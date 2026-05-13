@@ -1,7 +1,6 @@
 package com.mclavo.ecommerce.product.application;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -11,10 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mclavo.ecommerce.exception.ProductPurchaseException;
-import com.mclavo.ecommerce.product.api.ProductPurchaseRequest;
-import com.mclavo.ecommerce.product.api.ProductPurchaseResponse;
 import com.mclavo.ecommerce.product.api.ProductRequest;
 import com.mclavo.ecommerce.product.api.ProductResponse;
+import com.mclavo.ecommerce.product.api.ProductStockAdjustmentRequest;
+import com.mclavo.ecommerce.product.api.ProductUpdateRequest;
+import com.mclavo.ecommerce.product.domain.Category;
 import com.mclavo.ecommerce.product.domain.Product;
 import com.mclavo.ecommerce.product.domain.ProductReservation;
 import com.mclavo.ecommerce.product.domain.ProductReservationStatus;
@@ -59,34 +59,25 @@ public class ProductService {
     }
 
     @Transactional
-    public List<ProductPurchaseResponse> purchaseProducts(List<ProductPurchaseRequest> request) {
-        var productIds = request.stream()
-                .map(ProductPurchaseRequest::productId)
-                .toList();
+    public ProductResponse updateProduct(Integer productId, ProductUpdateRequest request) {
+        Product product = findProduct(productId);
 
-        var storedProducts = productRepository.findAllByIdInOrderByIdForUpdate(productIds);
-        if (storedProducts.size() != productIds.size()) {
-            throw new ProductPurchaseException("One or more products not found");
-        }
+        product.setName(request.name());
+        product.setDescription(request.description());
+        product.setPrice(request.price());
+        product.setCategory(Category.builder()
+                .id(request.categoryId())
+                .build());
 
-        var storedRequest = request.stream()
-                .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
-                .toList();
+        return productMapper.toProductResponse(product);
+    }
 
-        var purchasedProducts = new ArrayList<ProductPurchaseResponse>();
+    @Transactional
+    public ProductResponse adjustStock(Integer productId, ProductStockAdjustmentRequest request) {
+        Product product = findProduct(productId);
+        product.adjustAvailableStock(request.quantityDelta());
 
-        for (int i = 0; i < storedProducts.size(); i++) {
-            var storedProduct = storedProducts.get(i);
-            var purchaseRequest = storedRequest.get(i);
-
-            storedProduct.reserveStock(purchaseRequest.quantity());
-            storedProduct.commitReservedStock(purchaseRequest.quantity());
-            productRepository.save(storedProduct);
-
-            purchasedProducts.add(productMapper.toProductPurchaseResponse(storedProduct, purchaseRequest.quantity()));
-        }
-
-        return purchasedProducts;
+        return productMapper.toProductResponse(product);
     }
 
     @Transactional
@@ -136,6 +127,11 @@ public class ProductService {
     @Transactional
     public void releaseReservedStock(OrderCancelledEvent event) {
         finalizeReservedStock(event.orderId(), StockFinalization.RELEASE);
+    }
+
+    private Product findProduct(Integer productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
     }
 
     private Map<Integer, Integer> quantitiesByProductId(List<OrderProductItem> products) {

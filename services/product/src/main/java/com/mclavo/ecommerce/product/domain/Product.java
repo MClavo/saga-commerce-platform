@@ -70,6 +70,19 @@ public class Product {
         availableQuantity += quantity;
     }
 
+    public void adjustAvailableStock(Integer quantityDelta) {
+        if (quantityDelta == null || quantityDelta == 0) {
+            throw new ProductPurchaseException("Stock adjustment quantity delta must be non-zero");
+        }
+
+        int adjustedQuantity = availableQuantity + quantityDelta;
+        if (adjustedQuantity < 0) {
+            throw new ProductPurchaseException("Available stock cannot be negative for product with id: " + id);
+        }
+
+        availableQuantity = adjustedQuantity;
+    }
+
     private Integer normalizedReservedQuantity() {
         return reservedQuantity == null ? 0 : reservedQuantity;
     }

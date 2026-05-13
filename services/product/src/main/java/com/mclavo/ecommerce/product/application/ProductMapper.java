@@ -2,7 +2,6 @@ package com.mclavo.ecommerce.product.application;
 
 import org.springframework.stereotype.Service;
 
-import com.mclavo.ecommerce.product.api.ProductPurchaseResponse;
 import com.mclavo.ecommerce.product.api.ProductRequest;
 import com.mclavo.ecommerce.product.api.ProductResponse;
 import com.mclavo.ecommerce.product.domain.Category;
@@ -39,16 +38,6 @@ public class ProductMapper {
             product.getCategory().getName(),
             product.getCategory().getDescription()
         );
-    }
-
-    public ProductPurchaseResponse toProductPurchaseResponse(Product product, Integer quantity) {
-            return new ProductPurchaseResponse(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                quantity
-            );
     }
 
 }
