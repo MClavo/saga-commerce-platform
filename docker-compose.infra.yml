@@ -118,15 +118,17 @@ services:
     image: quay.io/keycloak/keycloak:26.6
     container_name: ms_keycloak
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME: http://localhost:9098
       KC_HOSTNAME_STRICT: "false"
+    volumes:
+      - ./docker/keycloak/ecommerce-realm.json:/opt/keycloak/data/import/ecommerce-realm.json:ro
     ports:
       - 9098:8080
     networks:
       - ecommerce-network
-    command: ["start-dev"]
+    command: ["start-dev", "--import-realm"]
 
 networks:
   ecommerce-network:

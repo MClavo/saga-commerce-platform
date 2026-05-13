@@ -1,0 +1,125 @@
+{
+  "realm": "ecommerce",
+  "enabled": true,
+  "displayName": "Ecommerce Microservices",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+
+  "roles": {
+    "realm": [
+      {
+        "name": "ROLE_ADMIN",
+        "description": "Full administrative access to the ecommerce platform"
+      },
+      {
+        "name": "ROLE_ORDER_MANAGER",
+        "description": "Can manage and inspect orders"
+      },
+      {
+        "name": "ROLE_CUSTOMER_SUPPORT",
+        "description": "Can inspect customer-related information"
+      }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "ecommerce-frontend",
+      "name": "Ecommerce Frontend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "http://localhost:5173/*",
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "http://localhost:5173",
+        "http://localhost:3000"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "ecommerce-internal",
+      "name": "Ecommerce Internal Services",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "bearerOnly": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "dev-internal-secret"
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@ecommerce.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ROLE_ADMIN",
+        "ROLE_ORDER_MANAGER",
+        "ROLE_CUSTOMER_SUPPORT"
+      ]
+    },
+    {
+      "username": "orders",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Order",
+      "lastName": "Manager",
+      "email": "orders@ecommerce.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "orders",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ROLE_ORDER_MANAGER"
+      ]
+    },
+    {
+      "username": "support",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Support",
+      "lastName": "User",
+      "email": "support@ecommerce.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "support",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ROLE_CUSTOMER_SUPPORT"
+      ]
+    }
+  ]
+}

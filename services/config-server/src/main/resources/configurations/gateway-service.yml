@@ -22,11 +22,5 @@ spring:
               predicates:
                 - Path=/api/v1/products/**
             
-            # TODO: Enforce security, only from other services, not from external clients
-            - id: payment-service
-              uri: ${PAYMENT_SERVICE_URI:lb:http://PAYMENT-SERVICE}
-              predicates:
-                - Path=/api/v1/payments/**
-
 server:
   port: 8222
