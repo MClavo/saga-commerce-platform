@@ -32,6 +32,14 @@ Do not use this skill for trivial edits where intent is already obvious, such as
 
 Keep the interview practical and focused. Ask only the most important questions needed to remove ambiguity for the current task.
 
+Questions must be asked interactively with the `question` tool. Do not write a list of open questions in a normal assistant message when user input is needed.
+
+Each interactive question should provide concrete choices. Prefer 2-5 options with short labels and clear descriptions. Include a recommended option first when the safest or most likely answer is clear.
+
+Always allow the user to type a custom answer through the tool's custom-answer support. Do not add an `Other` option manually.
+
+Use open-ended written questions only when the tool cannot represent the decision, and keep those rare.
+
 Do not ask a huge checklist every time. Pick the relevant parts only.
 
 Prefer a few targeted questions over broad discovery. If the user already provided enough context, ask no questions and move to the summary.
@@ -68,6 +76,8 @@ When enough context is available, summarize before touching code or proposing th
 - Remaining open questions, if any
 
 If important ambiguity remains, ask the smallest useful set of questions first. Do not include unrelated checklist items.
+
+When asking those questions, use the `question` tool instead of a normal text response. Group related decisions in one tool call when possible, but keep the total number of questions small.
 
 ## Proceeding
 
