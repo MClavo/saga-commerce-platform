@@ -38,12 +38,15 @@ public class Payment {
     private String paymentReference;
 
     private BigDecimal amount;
-    
+
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
-    
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
     private Integer orderId;
-     
+
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
