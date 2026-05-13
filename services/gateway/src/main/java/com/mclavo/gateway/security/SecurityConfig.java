@@ -46,7 +46,11 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/customers", "/api/v1/customers/**").hasAnyAuthority("ROLE_CUSTOMER_SUPPORT", "ROLE_ADMIN")
                         
                         // Payment
+                        .pathMatchers(HttpMethod.GET, "/api/v1/payments", "/api/v1/payments/**").hasAnyAuthority("ROLE_ORDER_MANAGER", "ROLE_ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/payments/demo/orders/*/confirm").hasAuthority("ROLE_ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/payments/demo/orders/*/fail").hasAuthority("ROLE_ADMIN")
                         .pathMatchers("/api/v1/payments", "/api/v1/payments/**").denyAll()
+                        
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakRealmRolesConverter())))

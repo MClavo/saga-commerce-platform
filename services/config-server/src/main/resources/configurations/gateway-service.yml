@@ -21,6 +21,11 @@ spring:
               uri: ${PRODUCT_SERVICE_URI:lb:http://PRODUCT-SERVICE}
               predicates:
                 - Path=/api/v1/products/**
-            
+
+            - id: payment-service
+              uri: ${PAYMENT_SERVICE_URI:lb:http://PAYMENT-SERVICE}
+              predicates:
+                - Path=/api/v1/payments/**
+
 server:
   port: 8222
