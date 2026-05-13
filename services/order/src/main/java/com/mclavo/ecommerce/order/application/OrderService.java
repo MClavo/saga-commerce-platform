@@ -97,7 +97,7 @@ public class OrderService {
     @Transactional
     public void reserveProducts(ProductReservationSucceededEvent event) {
         Order order = findOrderForSaga(event.orderId());
-        if (order.getStatus() == OrderStatus.PRODUCT_RESERVED
+        if (order.getStatus() == OrderStatus.AWAITING_PAYMENT
                 || order.getStatus() == OrderStatus.CONFIRMED
                 || order.getStatus() == OrderStatus.PAYMENT_FAILED) {
             return;
@@ -148,7 +148,7 @@ public class OrderService {
             return;
         }
 
-        ensureStatus(order, OrderStatus.PRODUCT_RESERVED);
+        ensureStatus(order, OrderStatus.AWAITING_PAYMENT);
         order.confirm();
 
         orderProducer.publishOrderConfirmed(new OrderConfirmedEvent(order.getId(), order.getReference()));
@@ -175,7 +175,7 @@ public class OrderService {
             return;
         }
 
-        ensureStatus(order, OrderStatus.PRODUCT_RESERVED);
+        ensureStatus(order, OrderStatus.AWAITING_PAYMENT);
         order.markPaymentFailed();
 
         orderProducer.publishOrderCancelled(new OrderCancelledEvent(order.getId(), order.getReference()));

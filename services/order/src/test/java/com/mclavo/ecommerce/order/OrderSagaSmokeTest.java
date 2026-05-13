@@ -177,7 +177,7 @@ class OrderSagaSmokeTest {
                 List.of(new ProductReservationItem(5, "Claw Hammer", 2, new BigDecimal("18.99")))));
 
         assertAll(
-                () -> assertEquals(OrderStatus.PRODUCT_RESERVED, order.getStatus()),
+                () -> assertEquals(OrderStatus.AWAITING_PAYMENT, order.getStatus()),
                 () -> assertEquals(new BigDecimal("37.98"), order.getTotalAmount()),
                 () -> assertEquals("Claw Hammer", order.getOrderLines().getFirst().getProductName()));
 

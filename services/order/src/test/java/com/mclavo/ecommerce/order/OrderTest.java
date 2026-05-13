@@ -48,7 +48,7 @@ class OrderTest {
     }
 
     @Test
-    void pendingCanTransitionToProductReserved() {
+    void pendingCanTransitionToAwaitingPayment() {
         Order order = order();
         order.addRequestedLine(5, 2);
         order.applyProductSnapshots(List.of(
@@ -56,11 +56,11 @@ class OrderTest {
 
         order.markProductsReserved();
 
-        assertEquals(OrderStatus.PRODUCT_RESERVED, order.getStatus());
+        assertEquals(OrderStatus.AWAITING_PAYMENT, order.getStatus());
     }
 
     @Test
-    void productReservedCanTransitionToConfirmed() {
+    void awaitingPaymentCanTransitionToConfirmed() {
         Order order = reservedOrder();
 
         order.confirm();
@@ -69,7 +69,7 @@ class OrderTest {
     }
 
     @Test
-    void productReservedCanTransitionToPaymentFailed() {
+    void awaitingPaymentCanTransitionToPaymentFailed() {
         Order order = reservedOrder();
 
         order.markPaymentFailed();
@@ -94,7 +94,7 @@ class OrderTest {
     }
 
     @Test
-    void productReservationFailedCannotTransitionToProductReserved() {
+    void productReservationFailedCannotTransitionToAwaitingPayment() {
         Order order = order();
         order.markProductReservationFailed();
 

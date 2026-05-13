@@ -132,7 +132,7 @@ public class Order {
     }
 
     public void confirm() {
-        transitionTo(OrderStatus.CONFIRMED, OrderStatus.PRODUCT_RESERVED);
+        transitionTo(OrderStatus.CONFIRMED, OrderStatus.AWAITING_PAYMENT);
     }
 
     /**
@@ -143,7 +143,7 @@ public class Order {
         if (orderLines.isEmpty() || orderLines.stream().anyMatch(line -> !line.hasProductSnapshot())) {
             throw new IllegalStateException("Cannot mark products reserved before product snapshots are applied");
         }
-        transitionTo(OrderStatus.PRODUCT_RESERVED, OrderStatus.PRODUCT_RESERVATION_PENDING);
+        transitionTo(OrderStatus.AWAITING_PAYMENT, OrderStatus.PRODUCT_RESERVATION_PENDING);
     }
 
     /**
@@ -158,7 +158,7 @@ public class Order {
      * still publishes an order.cancelled integration event for stock compensation.
      */
     public void markPaymentFailed() {
-        transitionTo(OrderStatus.PAYMENT_FAILED, OrderStatus.PRODUCT_RESERVED);
+        transitionTo(OrderStatus.PAYMENT_FAILED, OrderStatus.AWAITING_PAYMENT);
     }
 
     private void transitionTo(OrderStatus targetStatus, OrderStatus expectedCurrentStatus) {
