@@ -4,7 +4,7 @@ Base path: `/api/v1/payments`
 
 Payment creation is saga-driven through Kafka after Product Service reserves stock. The public API only exposes payment state inspection and demo-only confirm/fail actions for frontend saga demonstrations.
 
-These endpoints are allowed without authentication through the gateway and payment service security configuration.
+Gateway access: `GET` endpoints require `ROLE_ORDER_MANAGER` or `ROLE_ADMIN`. Demo `POST /demo/orders/{orderId}/confirm` and `POST /demo/orders/{orderId}/fail` require `ROLE_ADMIN`. Other payment paths are denied by the gateway.
 
 ## Payment Status
 

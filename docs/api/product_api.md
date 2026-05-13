@@ -4,6 +4,8 @@ Base path: `/api/v1/products`
 
 Product reservation and purchase are saga-driven through Kafka. There is no public `/purchase` endpoint.
 
+Gateway access: `GET` endpoints are public. `POST`, `PUT`, `PATCH`, and `DELETE` require `ROLE_ADMIN`.
+
 ## Product Response
 
 ```json

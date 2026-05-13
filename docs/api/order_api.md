@@ -4,7 +4,7 @@ Base path: `/api/v1/orders`
 
 Order creation starts the order-processing saga. Product reservation, payment, stock compensation, and notifications continue asynchronously through Kafka. Payment confirmation/failure is handled by Payment Service demo endpoints, not by Order Service.
 
-All endpoints require a valid JWT through the gateway or service security configuration.
+Gateway access: `POST` endpoints require any authenticated JWT. `GET` endpoints require `ROLE_ORDER_MANAGER` or `ROLE_ADMIN`.
 
 ## Order Status
 

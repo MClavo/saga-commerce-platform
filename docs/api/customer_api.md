@@ -2,7 +2,7 @@
 
 Base path: `/api/v1/customers`
 
-All endpoints require a valid JWT through the gateway or service security configuration.
+Gateway access: all customer endpoints require `ROLE_CUSTOMER_SUPPORT` or `ROLE_ADMIN`.
 
 ## Customer Request
 
