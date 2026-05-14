@@ -1,4 +1,21 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ecommerce-gateway
+            client-secret: ${KEYCLOAK_GATEWAY_SECRET:dev-gateway-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          keycloak:
+            issuer-uri: ${JWT_ISSUER_URI:http://localhost:9098/realms/ecommerce}
+            
   cloud:
     gateway:
       server:
@@ -8,24 +25,30 @@ spring:
               enabled: true
           routes:
             - id: customer-service
-              uri: ${CUSTOMER_SERVICE_URI:lb:http://CUSTOMER-SERVICE}
+              uri: ${CUSTOMER_SERVICE_URI:lb://CUSTOMER-SERVICE}
               predicates:
                 - Path=/api/v1/customers/**
 
             - id: order-service
-              uri: ${ORDER_SERVICE_URI:lb:http://ORDER-SERVICE}
+              uri: ${ORDER_SERVICE_URI:lb://ORDER-SERVICE}
               predicates:
                 - Path=/api/v1/orders/**
 
             - id: product-service
-              uri: ${PRODUCT_SERVICE_URI:lb:http://PRODUCT-SERVICE}
+              uri: ${PRODUCT_SERVICE_URI:lb://PRODUCT-SERVICE}
               predicates:
                 - Path=/api/v1/products/**
 
             - id: payment-service
-              uri: ${PAYMENT_SERVICE_URI:lb:http://PAYMENT-SERVICE}
+              uri: ${PAYMENT_SERVICE_URI:lb://PAYMENT-SERVICE}
               predicates:
                 - Path=/api/v1/payments/**
 
 server:
   port: 8222
+  reactive:
+  session:
+    cookie:
+      http-only: true
+      same-site: lax
+      secure: false

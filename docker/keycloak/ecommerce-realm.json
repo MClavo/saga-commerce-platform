@@ -33,7 +33,7 @@
       "protocol": "openid-connect",
       "publicClient": true,
       "standardFlowEnabled": true,
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "redirectUris": [
         "http://localhost:4200/*",
@@ -61,6 +61,20 @@
       "serviceAccountsEnabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "dev-internal-secret"
+    },
+    {
+      "clientId": "ecommerce-gateway",
+      "name": "Ecommerce Gateway BFF",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "dev-gateway-secret",
+      "redirectUris": ["http://localhost:8222/login/oauth2/code/keycloak"],
+      "webOrigins": ["http://localhost:8222"]
     }
   ],
 
@@ -99,9 +113,7 @@
           "temporary": false
         }
       ],
-      "realmRoles": [
-        "ROLE_ORDER_MANAGER"
-      ]
+      "realmRoles": ["ROLE_ORDER_MANAGER"]
     },
     {
       "username": "support",
@@ -117,9 +129,7 @@
           "temporary": false
         }
       ],
-      "realmRoles": [
-        "ROLE_CUSTOMER_SUPPORT"
-      ]
+      "realmRoles": ["ROLE_CUSTOMER_SUPPORT"]
     }
   ]
 }
