@@ -10,12 +10,10 @@ Used by create and update.
 
 ```json
 {
-  "id": "customer-1",
   "firstname": "Jane",
   "lastname": "Doe",
   "email": "jane.doe@example.com",
   "address": {
-    "id": "address-1",
     "street": "Main Street",
     "houseNumber": "42A",
     "zipCode": "10001"
@@ -38,7 +36,6 @@ Optional fields: `id`, `address`, and all address fields.
   "lastname": "Doe",
   "email": "jane.doe@example.com",
   "address": {
-    "id": "address-1",
     "street": "Main Street",
     "houseNumber": "42A",
     "zipCode": "10001"
