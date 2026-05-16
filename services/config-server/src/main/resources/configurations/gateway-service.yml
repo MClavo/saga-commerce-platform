@@ -14,7 +14,11 @@ spring:
               - email
         provider:
           keycloak:
-            issuer-uri: ${JWT_ISSUER_URI:http://localhost:9098/realms/ecommerce}
+            authorization-uri: ${KEYCLOAK_AUTHORIZATION_URI:http://localhost:9098/realms/ecommerce/protocol/openid-connect/auth}
+            token-uri: ${KEYCLOAK_TOKEN_URI:http://localhost:9098/realms/ecommerce/protocol/openid-connect/token}
+            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:9098/realms/ecommerce/protocol/openid-connect/certs}
+            user-info-uri: ${KEYCLOAK_USER_INFO_URI:http://localhost:9098/realms/ecommerce/protocol/openid-connect/userinfo}
+            user-name-attribute: preferred_username
             
   cloud:
     gateway:

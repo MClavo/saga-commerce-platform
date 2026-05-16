@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: payment-service
+  
+  cloud:
+    config:
+      enabled: false

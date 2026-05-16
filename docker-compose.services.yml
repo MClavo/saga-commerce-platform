@@ -10,6 +10,11 @@ x-config-client-env: &config-client-env
   EUREKA_SERVER_URL: http://discovery:8761/eureka/
   JWT_ISSUER_URI: http://localhost:9098/realms/ecommerce
   JWT_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+  KEYCLOAK_GATEWAY_SECRET: dev-gateway-secret
+  KEYCLOAK_AUTHORIZATION_URI: http://localhost:9098/realms/ecommerce/protocol/openid-connect/auth
+  KEYCLOAK_TOKEN_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/token
+  KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+  KEYCLOAK_USER_INFO_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/userinfo
 
 x-postgres-env: &postgres-env
   POSTGRES_USERNAME: postgres
