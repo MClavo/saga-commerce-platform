@@ -24,7 +24,7 @@ export function LoginPage() {
   const { isAuthenticated, isLoading, login, error } = useAuth()
   const location = useLocation()
   const state = location.state as LoginLocationState | null
-  const nextPath = state?.from?.pathname ?? "/auth-demo"
+  const nextPath = state?.from?.pathname ?? "/dashboard"
 
   if (isLoading) {
     return (

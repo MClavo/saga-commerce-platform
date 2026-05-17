@@ -9,5 +9,5 @@ export function RootRedirect() {
     return null
   }
 
-  return <Navigate replace to={isAuthenticated ? "/auth-demo" : "/login"} />
+  return <Navigate replace to={isAuthenticated ? "/dashboard" : "/login"} />
 }
