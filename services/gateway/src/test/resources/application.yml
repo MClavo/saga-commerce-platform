@@ -1,7 +1,37 @@
 spring:
   application:
     name: gateway-service
-  
+
   cloud:
     config:
       enabled: false
+    discovery:
+      enabled: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ecommerce-gateway
+            client-secret: dev-gateway-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          keycloak:
+            authorization-uri: http://localhost:9098/realms/ecommerce/protocol/openid-connect/auth
+            token-uri: http://localhost:9098/realms/ecommerce/protocol/openid-connect/token
+            jwk-set-uri: http://localhost:9098/realms/ecommerce/protocol/openid-connect/certs
+            user-info-uri: http://localhost:9098/realms/ecommerce/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+
+eureka:
+  client:
+    enabled: false
+
+app:
+  frontend-url: http://localhost:5173

@@ -15,6 +15,11 @@ x-config-client-env: &config-client-env
   KEYCLOAK_TOKEN_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/token
   KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
   KEYCLOAK_USER_INFO_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/userinfo
+  FRONTEND_URL: http://localhost:5173
+  ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+  ZIPKIN_ENABLED: "true"
+  TRACING_SAMPLING_PROBABILITY: "1.0"
+
 
 x-postgres-env: &postgres-env
   POSTGRES_USERNAME: postgres
@@ -119,8 +124,13 @@ services:
     <<: *service-defaults
     image: ecommerce/gateway:local-ecommerce
     container_name: ecommerce-gateway
+    mem_limit: 768m
     environment:
       <<: *config-client-env
+      JAVA_TOOL_OPTIONS: >-
+        -XX:MaxDirectMemorySize=128m
+        -XX:ReservedCodeCacheSize=64m
+        -Xss512k
     ports:
       - "8222:8222"
     depends_on:

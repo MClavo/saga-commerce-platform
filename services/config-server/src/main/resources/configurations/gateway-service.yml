@@ -24,6 +24,23 @@ spring:
     gateway:
       server:
         webflux:  
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins:
+                  - ${FRONTEND_URL:http://localhost:5173}
+                allowed-methods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowed-headers:
+                  - Authorization
+                  - Content-Type
+                  - Accept
+                allow-credentials: true
           discovery:
             locator:
               enabled: true
@@ -32,26 +49,39 @@ spring:
               uri: ${CUSTOMER_SERVICE_URI:lb://CUSTOMER-SERVICE}
               predicates:
                 - Path=/api/v1/customers/**
+              filters:
+                - TokenRelay=
 
             - id: order-service
               uri: ${ORDER_SERVICE_URI:lb://ORDER-SERVICE}
               predicates:
                 - Path=/api/v1/orders/**
+              filters:
+                - TokenRelay=
 
-            - id: product-service
+            - id: product-service-public-read
               uri: ${PRODUCT_SERVICE_URI:lb://PRODUCT-SERVICE}
               predicates:
                 - Path=/api/v1/products/**
+                - Method=GET
+
+            - id: product-service-protected-write
+              uri: ${PRODUCT_SERVICE_URI:lb://PRODUCT-SERVICE}
+              predicates:
+                - Path=/api/v1/products/**
+                - Method=POST,PUT,PATCH,DELETE
+              filters:
+                - TokenRelay=
 
             - id: payment-service
               uri: ${PAYMENT_SERVICE_URI:lb://PAYMENT-SERVICE}
               predicates:
                 - Path=/api/v1/payments/**
+              filters:
+                - TokenRelay=
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
-  keycloak:
-    logout-url: ${KEYCLOAK_LOGOUT_URL:http://localhost:9098/realms/ecommerce/protocol/openid-connect/logout}
 
 server:
   port: 8222

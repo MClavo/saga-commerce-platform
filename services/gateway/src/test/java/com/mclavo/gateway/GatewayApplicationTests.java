@@ -1,8 +1,9 @@
 package com.mclavo.gateway;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-// No security configuration is needed for this test, as it only checks if the application context loads successfully.
+@SpringBootTest
 class GatewayApplicationTests {
 
 	@Test

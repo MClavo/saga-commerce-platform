@@ -11,8 +11,8 @@ class GatewayAuthorizationRules {
         exchange
                 // Auth
                 .pathMatchers("/actuator/health").permitAll()
-                .pathMatchers("/auth/login", "/auth/csrf").permitAll()
-                .pathMatchers("/auth/me").authenticated()
+                .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .pathMatchers("/auth/login", "/auth/me").permitAll()
                 .pathMatchers(HttpMethod.POST, "/auth/logout").authenticated()
 
                 // Product
@@ -23,8 +23,7 @@ class GatewayAuthorizationRules {
                 .pathMatchers(HttpMethod.DELETE, "/api/v1/products", "/api/v1/products/**").hasAuthority("ROLE_ADMIN")
 
                 // Order
-                .pathMatchers(HttpMethod.POST, "/api/v1/orders", "/api/v1/orders/**").authenticated()
-                .pathMatchers(HttpMethod.GET, "/api/v1/orders", "/api/v1/orders/**")
+                .pathMatchers("/api/v1/orders", "/api/v1/orders/**")
                 .hasAnyAuthority("ROLE_ORDER_MANAGER", "ROLE_ADMIN")
 
                 // Customer

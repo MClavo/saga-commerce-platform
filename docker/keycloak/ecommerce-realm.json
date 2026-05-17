@@ -27,54 +27,128 @@
 
   "clients": [
     {
-      "clientId": "ecommerce-frontend",
-      "name": "Ecommerce Frontend",
+      "clientId": "ecommerce-gateway",
+      "name": "Ecommerce Gateway BFF",
+      "description": "Confidential OIDC client for gateway-service BFF login. Browser keeps only the Spring SESSION cookie; tokens stay server-side and access tokens are relayed downstream.",
       "enabled": true,
       "protocol": "openid-connect",
-      "publicClient": true,
+      "publicClient": false,
+      "bearerOnly": false,
       "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "dev-gateway-secret",
+
+      "rootUrl": "http://localhost:8222",
+      "adminUrl": "http://localhost:8222",
+      "baseUrl": "http://localhost:8222",
+
       "redirectUris": [
-        "http://localhost:4200/*",
-        "http://localhost:5173/*",
-        "http://localhost:3000/*"
-      ],
-      "webOrigins": [
-        "http://localhost:4200",
+        "http://localhost:8222/login/oauth2/code/keycloak",
         "http://localhost:5173",
-        "http://localhost:3000"
+        "http://localhost:5173/*"
       ],
+
+      "webOrigins": [
+        "http://localhost:8222",
+        "http://localhost:5173"
+      ],
+
+      "frontchannelLogout": false,
+
       "attributes": {
-        "pkce.code.challenge.method": "S256"
-      }
+        "post.logout.redirect.uris": "+"
+      },
+
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "preferred username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String",
+            "user.attribute": "username"
+          }
+        },
+        {
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "email",
+            "jsonType.label": "String",
+            "user.attribute": "email"
+          }
+        },
+        {
+          "name": "given name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "given_name",
+            "jsonType.label": "String",
+            "user.attribute": "firstName"
+          }
+        },
+        {
+          "name": "family name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "family_name",
+            "jsonType.label": "String",
+            "user.attribute": "lastName"
+          }
+        }
+      ]
     },
     {
       "clientId": "ecommerce-internal",
       "name": "Ecommerce Internal Services",
+      "description": "Confidential client reserved for future machine-to-machine communication between internal services.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
       "bearerOnly": false,
       "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "dev-internal-secret"
-    },
-    {
-      "clientId": "ecommerce-gateway",
-      "name": "Ecommerce Gateway BFF",
-      "enabled": true,
-      "protocol": "openid-connect",
-      "publicClient": false,
-      "standardFlowEnabled": true,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "dev-gateway-secret",
-      "redirectUris": ["http://localhost:8222/login/oauth2/code/keycloak"],
-      "webOrigins": ["http://localhost:8222"]
     }
   ],
 
@@ -113,7 +187,9 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["ROLE_ORDER_MANAGER"]
+      "realmRoles": [
+        "ROLE_ORDER_MANAGER"
+      ]
     },
     {
       "username": "support",
@@ -129,7 +205,9 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["ROLE_CUSTOMER_SUPPORT"]
+      "realmRoles": [
+        "ROLE_CUSTOMER_SUPPORT"
+      ]
     }
   ]
 }

@@ -15,7 +15,6 @@ services:
       - 5432:5432
     networks:
       - ecommerce-network
-    restart: unless-stopped
 
   pgadmin:
     container_name: ms_pgadmin
@@ -30,7 +29,6 @@ services:
       - 5050:80
     networks:
       - ecommerce-network
-    restart: unless-stopped
 
   mongodb:
     image: mongo
@@ -48,7 +46,6 @@ services:
   mongo-express:
     image: mongo-express
     container_name: ms_mongo_express
-    restart: always
     ports:
       - 8081:8081
     environment:
@@ -104,7 +101,6 @@ services:
       - 1025:1025
     networks:
       - ecommerce-network
-    restart: always
 
   zipkin:
     image: openzipkin/zipkin
