@@ -10,6 +10,14 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      "/auth": "http://localhost:8222",
+      "/api": "http://localhost:8222",
+      "/oauth2": "http://localhost:8222",
+      "/login": "http://localhost:8222",
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
