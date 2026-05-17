@@ -48,6 +48,11 @@ spring:
               predicates:
                 - Path=/api/v1/payments/**
 
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  keycloak:
+    logout-url: ${KEYCLOAK_LOGOUT_URL:http://localhost:9098/realms/ecommerce/protocol/openid-connect/logout}
+
 server:
   port: 8222
   reactive:
