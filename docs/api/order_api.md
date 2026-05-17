@@ -35,7 +35,8 @@ MASTERCARD
   "amount": 37.98,
   "paymentMethod": "CREDIT_CARD",
   "customerId": "customer-1",
-  "status": "AWAITING_PAYMENT"
+  "status": "AWAITING_PAYMENT",
+  "createdAt": "2026-05-13T10:15:30"
 }
 ```
 
@@ -69,7 +70,8 @@ Response: `200 OK`
     "amount": 37.98,
     "paymentMethod": "CREDIT_CARD",
     "customerId": "customer-1",
-    "status": "AWAITING_PAYMENT"
+    "status": "AWAITING_PAYMENT",
+    "createdAt": "2026-05-13T10:15:30"
   }
 ]
 ```
