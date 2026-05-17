@@ -28,7 +28,8 @@ public class OrderMapper {
                 order.getTotalAmount(),
                 order.getPaymentMethod(),
                 order.getCustomerId(),
-                order.getStatus()
+                order.getStatus(),
+                order.getCreatedAt()
         );
     }
 
