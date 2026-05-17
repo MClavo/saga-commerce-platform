@@ -2,27 +2,63 @@
 
 Base path: `/auth`
 
-Authentication is handled by the API Gateway using OAuth2 Login with Keycloak. The frontend does not store JWT tokens. The browser only keeps the gateway session cookie, which must be `HttpOnly`.
+Authentication is handled by `gateway-service` as a Backend-for-Frontend using Spring Security OAuth2 Login with Keycloak. The browser receives only a Spring-managed HttpOnly `SESSION` cookie; access tokens, refresh tokens, and ID tokens stay server-side in the Gateway session/authorized-client state.
 
-Downstream service calls are authenticated by the gateway using token relay.
+Downstream services do not use browser sessions. They receive `Authorization: Bearer <access_token>` from Gateway TokenRelay and validate JWTs as stateless OAuth2 Resource Servers.
 
-Gateway access:
-- `GET /auth/login` is public.
-- `GET /auth/csrf` is public.
-- `GET /auth/me` returns the current session state.
-- `POST /auth/logout` requires an authenticated session and a valid CSRF token.
+## Endpoints
 
-## Current User Response
+- `GET /auth/login` is public and redirects to `/oauth2/authorization/keycloak`.
+- `GET /auth/me` is public and returns `authenticated=false` when no Gateway session exists.
+- `POST /auth/logout` invalidates the Gateway session.
+
+There is no `/auth/csrf` endpoint in this iteration because Gateway CSRF is disabled for the local/demo API scope.
+
+## Login
+
+```http
+GET /auth/login
+```
+
+Starts Spring Security OAuth2 Login by redirecting the browser to:
+
+```http
+/oauth2/authorization/keycloak
+```
+
+Spring Security handles the standard callback:
+
+```http
+/login/oauth2/code/keycloak
+```
+
+The frontend must not call Keycloak token endpoints and must not store OAuth2 tokens.
+
+## Get Current User
+
+```http
+GET /auth/me
+```
 
 Authenticated response:
 
 ```json
 {
   "authenticated": true,
+  "subject": "keycloak-user-id",
   "username": "admin",
   "email": "admin@ecommerce.local",
   "name": "Admin User",
   "authorities": [
+    "OIDC_USER",
+    "SCOPE_openid",
+    "SCOPE_profile",
+    "SCOPE_email",
+    "ROLE_ADMIN",
+    "ROLE_ORDER_MANAGER",
+    "ROLE_CUSTOMER_SUPPORT"
+  ],
+  "roles": [
     "ROLE_ADMIN",
     "ROLE_ORDER_MANAGER",
     "ROLE_CUSTOMER_SUPPORT"
@@ -38,76 +74,7 @@ Unauthenticated response:
 }
 ```
 
-## CSRF Response
-
-```json
-{
-  "headerName": "X-CSRF-TOKEN",
-  "parameterName": "_csrf",
-  "token": "generated-csrf-token"
-}
-```
-
-## Login
-
-```http
-GET /auth/login
-```
-
-Starts the OAuth2 login flow.
-
-The gateway redirects the browser to the internal Spring Security OAuth2 authorization endpoint, which then redirects to Keycloak.
-
-Response: `302 Found`
-
-Redirect target:
-
-```http
-/oauth2/authorization/keycloak
-```
-
-Frontend usage:
-
-```ts
-window.location.href = "/auth/login";
-```
-
-Notes:
-- The frontend must not send username or password to the backend.
-- The frontend must not store access tokens or refresh tokens.
-- Successful login creates a gateway session cookie.
-
-## Get Current User
-
-```http
-GET /auth/me
-```
-
-Returns the currently authenticated user.
-
-Response when authenticated: `200 OK`
-
-```json
-{
-  "authenticated": true,
-  "username": "admin",
-  "email": "admin@ecommerce.local",
-  "name": "Admin User",
-  "authorities": [
-    "ROLE_ADMIN",
-    "ROLE_ORDER_MANAGER",
-    "ROLE_CUSTOMER_SUPPORT"
-  ]
-}
-```
-
-Response when unauthenticated: `200 OK`
-
-```json
-{
-  "authenticated": false
-}
-```
+`/auth/me` never returns raw tokens.
 
 Frontend usage:
 
@@ -117,132 +84,37 @@ const user = await fetch("/auth/me", {
 }).then(response => response.json());
 ```
 
-## Get CSRF Token
-
-```http
-GET /auth/csrf
-```
-
-Returns the CSRF token required for state-changing requests.
-
-Response: `200 OK`
-
-```json
-{
-  "headerName": "X-CSRF-TOKEN",
-  "parameterName": "_csrf",
-  "token": "generated-csrf-token"
-}
-```
-
-Frontend usage for JSON requests:
-
-```ts
-const csrf = await fetch("/auth/csrf", {
-  credentials: "include"
-}).then(response => response.json());
-
-await fetch("/api/v1/orders", {
-  method: "POST",
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-    [csrf.headerName]: csrf.token
-  },
-  body: JSON.stringify(payload)
-});
-```
-
 ## Logout
 
 ```http
 POST /auth/logout
-Content-Type: application/x-www-form-urlencoded
 ```
 
-Logs out the user from the gateway session.
-
-If Keycloak logout is configured through a logout success handler, the gateway also redirects the browser to the Keycloak logout endpoint so the user can switch accounts cleanly.
-
-Requires a valid CSRF token.
-
-Request:
-
-```http
-POST /auth/logout
-Content-Type: application/x-www-form-urlencoded
-
-_csrf=generated-csrf-token
-```
-
-Response: `302 Found`
-
-Redirect target when only local gateway logout is configured:
-
-```http
-/
-```
-
-Redirect target when Keycloak logout is enabled:
-
-```http
-/keycloak/logout-endpoint
-```
+Invalidates the Gateway `SESSION` and redirects to the configured frontend URL. This iteration keeps logout local to the Gateway; Keycloak/OIDC logout can be added later if account switching requires ending the Keycloak SSO session too.
 
 Frontend usage:
 
 ```ts
-async function logout() {
-  const csrf = await fetch("/auth/csrf", {
-    credentials: "include"
-  }).then(response => response.json());
-
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = "/auth/logout";
-
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.name = csrf.parameterName;
-  input.value = csrf.token;
-
-  form.appendChild(input);
-  document.body.appendChild(form);
-  form.submit();
-}
+const form = document.createElement("form");
+form.method = "POST";
+form.action = "/auth/logout";
+document.body.appendChild(form);
+form.submit();
 ```
-
-Notes:
-- Prefer form submission over `fetch` for logout because the browser can naturally follow redirects to Keycloak.
-- Local gateway logout alone may not clear the Keycloak SSO session.
-- For demo user switching, logout should clear both the gateway session and the Keycloak session.
 
 ## Session Model
 
-The frontend must call backend endpoints with credentials included:
+Expected browser-visible state:
 
-```ts
-fetch("/api/v1/products", {
-  credentials: "include"
-});
-```
+- `SESSION`: an opaque, HttpOnly Spring session identifier.
+- No `access_token` cookie.
+- No `refresh_token` cookie.
+- No `id_token` cookie.
+- No JWT in `localStorage` or `sessionStorage`.
+- No frontend-managed `Authorization: Bearer` header.
 
-The frontend must not access or persist OAuth2 tokens.
+`SESSION` is correct because the Gateway is the BFF and owns browser authentication state. It is not a JWT and does not expose token contents to JavaScript.
 
-Expected browser storage:
-- Gateway session cookie: `HttpOnly`.
-- CSRF token cookie or response value: readable by the frontend if required.
-- No access token in `localStorage`.
-- No refresh token in `localStorage`.
-- No JWT managed directly by React.
+## CSRF Tradeoff
 
-## Gateway Responsibilities
-
-The gateway is responsible for:
-- Starting the OAuth2 login flow.
-- Maintaining the authenticated user session.
-- Exposing the current user through `/auth/me`.
-- Providing CSRF tokens through `/auth/csrf`.
-- Handling logout through `/auth/logout`.
-- Relaying the access token to downstream services.
-- Enforcing route-level authorization before forwarding requests.
+Gateway CSRF is disabled for this local/demo iteration. The current mitigation is an HttpOnly `SESSION` cookie, `SameSite=Lax`, and strict Gateway CORS credentials for the frontend origin. Re-enable CSRF or add equivalent request protections before treating cross-site unsafe requests as production-ready.

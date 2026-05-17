@@ -1,5 +1,11 @@
 # Frontend Demo Design Guide
 
+## Api Reference
+- [customer](./api/customer_api.md)
+- [order](./api/order_api.md)
+- [product](./api/product_api.md)
+- [payment](./api/payment_api.md)
+
 ## Purpose
 
 This frontend should be a **technical demo console**, not a generic consumer e-commerce storefront.
