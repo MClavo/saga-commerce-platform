@@ -138,3 +138,60 @@ Customer address display:
 - Partial addresses omit missing pieces.
 
 Customer mutations remain backend-authorized. The UI mirrors role rules but does not replace backend enforcement.
+
+## Orders Contract
+
+The Orders page includes:
+
+- Protected route requiring Order Manager or Admin.
+- Top navigation link visible to all authenticated users; route guards enforce access.
+- Header refresh action only.
+- Order table as the primary view.
+- Local search by reference, order ID, and customer ID.
+- Exact status filter for All plus the public order statuses.
+- Newest-first sorting by `createdAt`, with descending `id` fallback.
+- Real metrics for Total orders, Active sagas, Awaiting payment, and Failed orders.
+- Explicit `View Flow` table action; list rows are not clickable.
+
+The Order Flow page includes:
+
+- Route `/orders/:id/flow`.
+- Page title `Order Flow`.
+- Header actions for Back to Orders and Refresh.
+- Desktop layout with saga timeline as the main column and order summary/payment state as the side column.
+- Manual refresh plus polling indicator.
+- Inline errors only; no success toasts.
+
+Order Flow polling rules:
+
+- Poll order state every 2 seconds while the order is not terminal.
+- Stop order polling when status is `CONFIRMED`, `PRODUCT_RESERVATION_FAILED`, or `PAYMENT_FAILED`.
+- Fetch payment state only for `AWAITING_PAYMENT`, `CONFIRMED`, and `PAYMENT_FAILED`.
+- Treat missing payment during `AWAITING_PAYMENT` as a waiting state.
+- Treat missing payment for terminal payment outcomes as an inconsistency.
+
+Order Flow timeline milestones:
+
+- Order created.
+- Product reservation pending.
+- Product reserved.
+- Payment pending.
+- Payment resolved.
+- Order resolved.
+
+Timeline statuses are inferred from public order and payment statuses. The UI must not expose internal-only order statuses as current order state.
+
+Payment demo actions:
+
+- Live in the payment panel on the Order Flow page.
+- Available only when order status is `AWAITING_PAYMENT` and payment status is `PENDING`.
+- Admin users can confirm payment directly.
+- Admin users must confirm before failing payment.
+- Non-admin users see disabled controls with Admin-required context.
+
+Order lines display:
+
+- Always show requested product ID and quantity.
+- Before product snapshot data arrives, show pending placeholders for product name, unit price, and line total.
+- After reservation succeeds, show confirmed product name, unit price, line total, and confirmed lines total.
+- Show non-blocking warnings when confirmed line totals or payment amounts differ from the order amount after rounding to cents.

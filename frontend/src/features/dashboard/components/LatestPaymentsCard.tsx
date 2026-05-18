@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button"
+import type { KeyboardEvent } from "react"
+import { useNavigate } from "react-router-dom"
 import { EmptyState, ErrorState, RestrictedState, TableSkeleton } from "@/components/shared/DataState"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/shared/StatusBadge"
@@ -22,6 +24,19 @@ type LatestPaymentsCardProps = {
 }
 
 export function LatestPaymentsCard({ state, payments, hasMore }: LatestPaymentsCardProps) {
+  const navigate = useNavigate()
+
+  function openOrderFlow(orderId: number) {
+    navigate(`/orders/${orderId}/flow`)
+  }
+
+  function openOrderFlowFromKeyboard(event: KeyboardEvent<HTMLTableRowElement>, orderId: number) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      openOrderFlow(orderId)
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -55,7 +70,14 @@ export function LatestPaymentsCard({ state, payments, hasMore }: LatestPaymentsC
             </TableHeader>
             <TableBody>
               {payments.map((payment) => (
-                <TableRow key={payment.id}>
+                <TableRow
+                  key={payment.id}
+                  className="cursor-pointer"
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => openOrderFlow(payment.orderId)}
+                  onKeyDown={(event) => openOrderFlowFromKeyboard(event, payment.orderId)}
+                >
                   <TableCell className="font-medium">{payment.paymentReference}</TableCell>
                   <TableCell>
                     <StatusBadge meta={getPaymentStatusMeta(payment.status)} status={payment.status} />

@@ -9,7 +9,7 @@ const navItems = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Catalog", href: "/catalog" },
   { label: "Customers", href: "/customers" },
-  { label: "Orders" },
+  { label: "Orders", href: "/orders" },
   { label: "Saga Demo" },
 ]
 
@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
             >
               {navItems.map((item) => {
-                const isActive = item.href === location.pathname
+                const isActive = item.href === location.pathname || Boolean(item.href && location.pathname.startsWith(`${item.href}/`))
 
                 if (!item.href) {
                   return (

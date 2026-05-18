@@ -1,3 +1,6 @@
+import type { KeyboardEvent } from "react"
+import { Link, useNavigate } from "react-router-dom"
+
 import { Button } from "@/components/ui/button"
 import { EmptyState, ErrorState, RestrictedState, TableSkeleton } from "@/components/shared/DataState"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,6 +25,19 @@ type LatestOrdersCardProps = {
 }
 
 export function LatestOrdersCard({ state, orders, hasMore }: LatestOrdersCardProps) {
+  const navigate = useNavigate()
+
+  function openOrderFlow(orderId: number) {
+    navigate(`/orders/${orderId}/flow`)
+  }
+
+  function openOrderFlowFromKeyboard(event: KeyboardEvent<HTMLTableRowElement>, orderId: number) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      openOrderFlow(orderId)
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -31,8 +47,8 @@ export function LatestOrdersCard({ state, orders, hasMore }: LatestOrdersCardPro
         </div>
         {hasMore ? (
           <CardAction>
-            <Button disabled size="sm" type="button" variant="outline">
-              View all
+            <Button asChild size="sm" type="button" variant="outline">
+              <Link to="/orders">View all</Link>
             </Button>
           </CardAction>
         ) : null}
@@ -55,7 +71,14 @@ export function LatestOrdersCard({ state, orders, hasMore }: LatestOrdersCardPro
             </TableHeader>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id}>
+                <TableRow
+                  key={order.id}
+                  className="cursor-pointer"
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => openOrderFlow(order.id)}
+                  onKeyDown={(event) => openOrderFlowFromKeyboard(event, order.id)}
+                >
                   <TableCell className="font-medium">{order.reference}</TableCell>
                   <TableCell>
                     <StatusBadge meta={getOrderStatusMeta(order.status)} status={order.status} />

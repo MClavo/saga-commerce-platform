@@ -16,3 +16,15 @@ export type PaymentResponse = {
 export function listPayments() {
   return apiFetch<PaymentResponse[]>("/api/v1/payments")
 }
+
+export function getPaymentByOrder(orderId: number) {
+  return apiFetch<PaymentResponse>(`/api/v1/payments/orders/${orderId}`)
+}
+
+export function confirmDemoPayment(orderId: number) {
+  return apiFetch<PaymentResponse>(`/api/v1/payments/demo/orders/${orderId}/confirm`, { method: "POST" })
+}
+
+export function failDemoPayment(orderId: number) {
+  return apiFetch<PaymentResponse>(`/api/v1/payments/demo/orders/${orderId}/fail`, { method: "POST" })
+}

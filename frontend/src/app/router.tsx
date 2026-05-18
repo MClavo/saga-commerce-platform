@@ -4,6 +4,8 @@ import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute"
 import { RootRedirect } from "@/app/RootRedirect"
 import { CustomersPage } from "@/features/customers/CustomersPage"
 import { DashboardPage } from "@/features/dashboard/DashboardPage"
+import { OrderFlowPage } from "@/features/orders/OrderFlowPage"
+import { OrdersPage } from "@/features/orders/OrdersPage"
 import { CatalogPage } from "@/features/products/CatalogPage"
 import { LoginPage } from "@/features/auth/pages/LoginPage"
 import { UnauthorizedPage } from "@/features/auth/pages/UnauthorizedPage"
@@ -38,6 +40,22 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={["ROLE_CUSTOMER_SUPPORT", "ROLE_ADMIN"]}>
         <CustomersPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/orders",
+    element: (
+      <ProtectedRoute roles={["ROLE_ORDER_MANAGER", "ROLE_ADMIN"]}>
+        <OrdersPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/orders/:id/flow",
+    element: (
+      <ProtectedRoute roles={["ROLE_ORDER_MANAGER", "ROLE_ADMIN"]}>
+        <OrderFlowPage />
       </ProtectedRoute>
     ),
   },
