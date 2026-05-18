@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { RootRedirect } from "@/app/RootRedirect"
 import { DashboardPage } from "@/features/dashboard/DashboardPage"
+import { CatalogPage } from "@/features/products/CatalogPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { UnauthorizedPage } from "@/pages/UnauthorizedPage"
 
@@ -20,6 +21,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <DashboardPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/catalog",
+    element: (
+      <ProtectedRoute>
+        <CatalogPage />
       </ProtectedRoute>
     ),
   },

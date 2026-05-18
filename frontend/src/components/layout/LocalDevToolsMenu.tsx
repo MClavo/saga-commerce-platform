@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,8 +16,9 @@ export function LocalDevToolsMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline">
+        <Button className="h-9 px-3" type="button" variant="outline">
           Local Dev Tools
+          <ChevronDown data-icon="inline-end" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72">

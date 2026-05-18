@@ -83,7 +83,9 @@ INSERT INTO product (id, description, name, available_quantity, price, category_
     (63, 'Cordless grass trimmer for edges and light overgrowth.', 'Grass Trimmer 20V', 10, 109.99, 8);
 
 -- Keep sequences aligned in case inserts rely on nextval later
-SELECT setval('category_seq', 9, false);
-SELECT setval('product_seq', 64, false);
+-- SELECT setval('category_seq', 9, false);
+-- SELECT setval('product_seq', 64, false);
+SELECT setval('product_seq', (SELECT MAX(id) FROM product), true);
+SELECT setval('category_seq', (SELECT MAX(id) FROM category), true);
 
 COMMIT;

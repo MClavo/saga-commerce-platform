@@ -23,7 +23,7 @@ Avoid consumer storefront patterns, marketing sections, fake analytics, and deco
 Primary app navigation for the current phase:
 
 - Dashboard: active route.
-- Catalog: disabled roadmap item.
+- Catalog: active route.
 - Customers: disabled roadmap item.
 - Orders: disabled roadmap item.
 - Saga Demo: disabled roadmap item.
@@ -95,3 +95,23 @@ The dashboard includes:
 - Compact saga flow explanation.
 - Disabled `Start Saga Demo` action until the saga demo page is implemented.
 - Local Dev Tools launcher with Keycloak, Zipkin, MailDev, pgAdmin, and Mongo Express links.
+
+## Catalog Contract
+
+The Catalog page includes:
+
+- Product table as the primary view.
+- Search by product name, description, or category.
+- Category filter derived from loaded products.
+- Stock filter for All, In Stock, Low Stock, and Out Of Stock.
+- Product detail sheet opened from table actions.
+- Admin-only create, edit, and stock adjustment actions.
+- Disabled mutation controls for non-admin users with clear Admin role language.
+
+Stock badge thresholds:
+
+- Out Of Stock: `availableQuantity <= 0`
+- Low Stock: `availableQuantity > 0 && availableQuantity <= 5`
+- In Stock: `availableQuantity > 5`
+
+Catalog mutations remain backend-authorized. The UI mirrors role rules but does not replace backend enforcement.

@@ -17,7 +17,7 @@ export function DashboardPage() {
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Technical demo console</p>
             <div className="flex flex-col gap-2">
               <h1 className="max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl">
-                Operational view of the order-processing backend.
+                Operational view of the Ecommerce backend.
               </h1>
               <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
                 Real counts, role-aware sections, latest saga activity, and local infrastructure links for reviewers.

@@ -19,3 +19,7 @@ Local browser interfaces for inspecting demo infrastructure and operations. They
 ## Order Processing Saga
 
 The distributed order workflow that validates a customer, reserves products, requests payment, resolves final order state, and triggers notification.
+
+## Product
+
+A catalog item with price, category, and available stock. Product stock is visible because order processing depends on product reservation.
