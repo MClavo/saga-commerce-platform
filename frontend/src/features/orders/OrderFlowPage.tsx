@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react"
 import { Link, useParams } from "react-router-dom"
+import { toast } from "sonner"
 
 import { AppShell } from "@/components/layout/AppShell"
 import { EmptyState, ErrorState, TableSkeleton } from "@/components/shared/DataState"
@@ -11,7 +13,45 @@ import { OrderSummaryCard } from "@/features/orders/components/OrderSummaryCard"
 import { PaymentPanel } from "@/features/orders/components/PaymentPanel"
 import { SagaTimeline } from "@/features/orders/components/SagaTimeline"
 import { useAuth } from "@/features/auth/use-auth"
+import { isTerminalOrderStatus } from "@/features/orders/order-utils"
 import { useOrderFlowData } from "@/features/orders/use-order-flow-data"
+import type { OrderStatus } from "@/shared/status-meta"
+import { localDevTools } from "@/shared/local-dev-tools"
+
+const mailDevTool = localDevTools.find((tool) => tool.name === "MailDev")
+
+function openMailDev() {
+  if (!mailDevTool) {
+    return
+  }
+
+  window.open(mailDevTool.href, "_blank", "noopener,noreferrer")
+}
+
+function notifyFlowFinished(reference: string, status: OrderStatus) {
+  const baseOptions = {
+    id: `order-flow-finished-${reference}`,
+    description: <span className="text-foreground">Order flow reached final state. Notification email should now be available in MailDev.</span>,
+    action: mailDevTool
+      ? {
+          label: "Open MailDev",
+          onClick: openMailDev,
+        }
+      : undefined,
+  }
+
+  if (status === "CONFIRMED") {
+    toast.success(`Order ${reference} confirmed.`, baseOptions)
+    return
+  }
+
+  if (status === "PRODUCT_RESERVATION_FAILED") {
+    toast.error(`Order ${reference} ended: reservation failed.`, baseOptions)
+    return
+  }
+
+  toast.error(`Order ${reference} ended: payment failed.`, baseOptions)
+}
 
 function parseOrderId(value: string | undefined) {
   if (!value) {
@@ -40,6 +80,26 @@ export function OrderFlowPage() {
     isConfirmingPayment,
     isFailingPayment,
   } = useOrderFlowData(orderId)
+  const previousOrderStatusRef = useRef<OrderStatus | null>(null)
+
+  useEffect(() => {
+    previousOrderStatusRef.current = null
+  }, [orderId])
+
+  useEffect(() => {
+    if (order.status !== "success") {
+      return
+    }
+
+    const currentStatus = order.data.status
+    const previousStatus = previousOrderStatusRef.current
+
+    if (previousStatus && previousStatus !== currentStatus && !isTerminalOrderStatus(previousStatus) && isTerminalOrderStatus(currentStatus)) {
+      notifyFlowFinished(order.data.reference, currentStatus)
+    }
+
+    previousOrderStatusRef.current = currentStatus
+  }, [order])
 
   const headerActions = (
     <>
@@ -126,7 +186,6 @@ export function OrderFlowPage() {
             <OrderLinesCard order={order.data} state={orderLines} />
           </div>
           <div className="flex flex-col gap-6">
-            <OrderSummaryCard order={order.data} />
             <PaymentPanel
               order={order.data}
               payment={payment}
@@ -137,6 +196,7 @@ export function OrderFlowPage() {
               onConfirmPayment={confirmPayment}
               onFailPayment={failPayment}
             />
+            <OrderSummaryCard order={order.data} />
           </div>
         </section>
       </div>

@@ -21,8 +21,32 @@ export type OrderLineResponse = {
   unitPrice: number | null
 }
 
+export type CreateOrderProductRequest = {
+  productId: number
+  quantity: number
+}
+
+export type CreateOrderRequest = {
+  reference: string
+  paymentMethod: PaymentMethod
+  customerId: string
+  products: CreateOrderProductRequest[]
+}
+
+export type CreateOrderResponse = {
+  orderId: number
+  status: OrderStatus
+}
+
 export function listOrders() {
   return apiFetch<OrderResponse[]>("/api/v1/orders")
+}
+
+export function createOrder(request: CreateOrderRequest) {
+  return apiFetch<CreateOrderResponse>("/api/v1/orders", {
+    method: "POST",
+    body: JSON.stringify(request),
+  })
 }
 
 export function getOrder(orderId: number) {

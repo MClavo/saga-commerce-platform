@@ -7,6 +7,7 @@ import { DashboardPage } from "@/features/dashboard/DashboardPage"
 import { OrderFlowPage } from "@/features/orders/OrderFlowPage"
 import { OrdersPage } from "@/features/orders/OrdersPage"
 import { CatalogPage } from "@/features/products/CatalogPage"
+import { SagaDemoPage } from "@/features/saga-demo/SagaDemoPage"
 import { LoginPage } from "@/features/auth/pages/LoginPage"
 import { UnauthorizedPage } from "@/features/auth/pages/UnauthorizedPage"
 
@@ -56,6 +57,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={["ROLE_ORDER_MANAGER", "ROLE_ADMIN"]}>
         <OrderFlowPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/saga-demo",
+    element: (
+      <ProtectedRoute roles={["ROLE_ADMIN"]}>
+        <SagaDemoPage />
       </ProtectedRoute>
     ),
   },

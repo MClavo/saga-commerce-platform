@@ -25,8 +25,8 @@ Primary app navigation for the current phase:
 - Dashboard: active route.
 - Catalog: active route.
 - Customers: active route, restricted to Customer Support/Admin.
-- Orders: disabled roadmap item.
-- Saga Demo: disabled roadmap item.
+- Orders: active route, restricted to Order Manager/Admin.
+- Saga Demo: active route for Admin, visible as a disabled roadmap-style item for non-admin users.
 
 Local Dev Tools are separate from product navigation. They link only to localhost browser UIs for local infrastructure and must open in a new tab.
 
@@ -93,7 +93,7 @@ The dashboard includes:
 - Latest orders, sorted by descending `createdAt`, with descending `id` fallback.
 - Latest payments, sorted by descending `createdAt`, with descending `id` fallback.
 - Compact saga flow explanation.
-- Disabled `Start Saga Demo` action until the saga demo page is implemented.
+- `Start Saga Demo` action enabled for Admin users and disabled with Admin-required context for non-admin users.
 - Local Dev Tools launcher with Keycloak, Zipkin, MailDev, pgAdmin, and Mongo Express links.
 
 ## Catalog Contract
@@ -195,3 +195,25 @@ Order lines display:
 - Before product snapshot data arrives, show pending placeholders for product name, unit price, and line total.
 - After reservation succeeds, show confirmed product name, unit price, line total, and confirmed lines total.
 - Show non-blocking warnings when confirmed line totals or payment amounts differ from the order amount after rounding to cents.
+
+## Saga Demo Contract
+
+The Saga Demo page includes:
+
+- Route `/saga-demo`, protected for Admin users only.
+- Top navigation item visible to authenticated users; non-admin users see it disabled with Admin-required context.
+- Page title `Start Saga Demo`.
+- Linear four-step wizard: Select Customer, Select Products, Select Payment, Review And Create.
+- Session-scoped draft persistence for reference, selected customer, product quantities, payment method, and current step.
+- Generated read-only reference using `DEMO-YYYYMMDD-HHMMSS-<short-random>` when a new wizard session starts.
+- `Reset demo` action that clears the local draft without confirmation.
+- Customer selection from existing customers only, using a searchable table with selected row highlighting.
+- Product selection from existing products only, using search, category filter, and inline integer quantity.
+- Product quantity rules: `0` means unselected, `1..999` means selected, values above available stock are allowed with explicit warning for reservation-failure demonstrations.
+- Pre-create money labeled `Estimated total`; confirmed totals remain owned by Order Flow after reservation.
+- Payment method selection with no default, using friendly labels and raw enum values.
+- Review sections for Reference, Customer, Products, Payment, Estimated Total, Warnings, and `Create Order → View Flow`.
+- Inline errors only; no success toasts.
+- On successful order creation, clear the local draft and redirect immediately to `/orders/:id/flow`.
+
+Saga Demo does not include customer mutation, product mutation, stock adjustment, product detail fetches, customer detail fetches, payment inspection, or payment actions. Those remain owned by Customers, Catalog, and Order Flow.

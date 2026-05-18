@@ -1,6 +1,9 @@
+import { Link } from "react-router-dom"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/features/auth/use-auth"
 
 const sagaSteps = [
   "Validate customer",
@@ -11,6 +14,9 @@ const sagaSteps = [
 ]
 
 export function SagaFlowCard() {
+  const { hasRole } = useAuth()
+  const isAdmin = hasRole("ROLE_ADMIN")
+
   return (
     <Card>
       <CardHeader>
@@ -35,11 +41,19 @@ export function SagaFlowCard() {
         </div>
         <div className="flex flex-col justify-between gap-3 rounded-lg border p-4">
           <p className="text-sm text-muted-foreground">
-            The action is intentionally disabled until the dedicated Saga Demo page is implemented.
+            {isAdmin
+              ? "Create a demo order, then jump directly into Order Flow to watch the saga resolve."
+              : "Start Saga Demo requires Admin because it crosses customer, order, and payment demo actions."}
           </p>
-          <Button disabled type="button">
-            Start Saga Demo
-          </Button>
+          {isAdmin ? (
+            <Button asChild type="button">
+              <Link to="/saga-demo">Start Saga Demo</Link>
+            </Button>
+          ) : (
+            <Button disabled type="button">
+              Start Saga Demo
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

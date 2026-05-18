@@ -31,3 +31,7 @@ A business record representing an attempt to settle the financial obligation ass
 ## Product
 
 A catalog item with price, category, and available stock. Product stock is visible because order processing depends on product reservation.
+
+## Saga Demo
+
+A guided admin workflow for creating a demo order and observing its Order Processing Saga from creation through final resolution.

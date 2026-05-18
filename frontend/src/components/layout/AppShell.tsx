@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
 
 import { UserMenu } from "@/features/auth/components/UserMenu"
+import { useAuth } from "@/features/auth/use-auth"
 import { LocalDevToolsMenu } from "@/components/layout/LocalDevToolsMenu"
 import { cn } from "@/lib/utils"
 
@@ -10,11 +11,13 @@ const navItems = [
   { label: "Catalog", href: "/catalog" },
   { label: "Customers", href: "/customers" },
   { label: "Orders", href: "/orders" },
-  { label: "Saga Demo" },
+  { label: "Saga Demo", href: "/saga-demo", adminOnly: true },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
+  const { hasRole } = useAuth()
+  const isAdmin = hasRole("ROLE_ADMIN")
 
   return (
     <div className="min-h-[100dvh] bg-background">
@@ -38,11 +41,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               {navItems.map((item) => {
                 const isActive = item.href === location.pathname || Boolean(item.href && location.pathname.startsWith(`${item.href}/`))
 
-                if (!item.href) {
+                if (!item.href || (item.adminOnly && !isAdmin)) {
                   return (
                     <span
                       key={item.label}
                       aria-disabled="true"
+                      title={item.adminOnly ? "Requires Admin" : undefined}
                       className="inline-flex h-9 items-center border-b-2 border-transparent text-sm font-medium text-muted-foreground/60"
                     >
                       {item.label}
