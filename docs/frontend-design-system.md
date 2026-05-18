@@ -13,7 +13,7 @@ Avoid consumer storefront patterns, marketing sections, fake analytics, and deco
 ## Layout
 
 - Use a compact top application bar for primary navigation, Local Dev Tools, and the current user menu.
-- Keep `Dashboard` as the only active app route until additional pages are implemented.
+- Keep implemented pages as active routes and planned pages as disabled roadmap labels.
 - Roadmap navigation items may be visible as disabled labels when they communicate planned scope.
 - Use responsive single-column layouts below `md`.
 - Prefer asymmetric grid composition on desktop when it improves scanning, but keep operational readability above novelty.
@@ -24,7 +24,7 @@ Primary app navigation for the current phase:
 
 - Dashboard: active route.
 - Catalog: active route.
-- Customers: disabled roadmap item.
+- Customers: active route, restricted to Customer Support/Admin.
 - Orders: disabled roadmap item.
 - Saga Demo: disabled roadmap item.
 
@@ -115,3 +115,26 @@ Stock badge thresholds:
 - In Stock: `availableQuantity > 5`
 
 Catalog mutations remain backend-authorized. The UI mirrors role rules but does not replace backend enforcement.
+
+## Customers Contract
+
+The Customers page includes:
+
+- Protected route requiring Customer Support or Admin.
+- Header restriction label: `Restricted: Customer Support / Admin`.
+- Customer table as the primary view.
+- Local search by full name, first name, last name, email, customer ID, and address summary.
+- Alphabetical sort by last name, first name, then email.
+- Real metrics for Total customers, With address, and Missing address.
+- Detail sheet opened from table actions.
+- Create and update dialog for first name, last name, email, and optional embedded address.
+- Delete confirmation dialog with hard-delete warning.
+
+Customer address display:
+
+- Address is an embedded value object with street, house number, and zip code.
+- If address exists, render compactly as `Main Street 12, 29001`.
+- If address is null or all parts are blank, render `No address`.
+- Partial addresses omit missing pieces.
+
+Customer mutations remain backend-authorized. The UI mirrors role rules but does not replace backend enforcement.

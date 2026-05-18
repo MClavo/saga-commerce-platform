@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { RootRedirect } from "@/app/RootRedirect"
+import { CustomersPage } from "@/features/customers/CustomersPage"
 import { DashboardPage } from "@/features/dashboard/DashboardPage"
 import { CatalogPage } from "@/features/products/CatalogPage"
 import { LoginPage } from "@/pages/LoginPage"
@@ -29,6 +30,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CatalogPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/customers",
+    element: (
+      <ProtectedRoute roles={["ROLE_CUSTOMER_SUPPORT", "ROLE_ADMIN"]}>
+        <CustomersPage />
       </ProtectedRoute>
     ),
   },
