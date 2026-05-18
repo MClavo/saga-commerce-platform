@@ -17,7 +17,7 @@ export function ProtectedRoute({ roles, children }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-background p-6">
+      <main className="min-h-[100dvh] bg-background p-6">
         <Card className="mx-auto max-w-xl">
           <CardHeader>
             <CardTitle>Checking session</CardTitle>

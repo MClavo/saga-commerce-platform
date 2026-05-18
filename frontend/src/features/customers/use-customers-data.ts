@@ -9,15 +9,9 @@ import {
   type CustomerResponse,
 } from "@/features/customers/customer-api"
 import { formatCustomerApiError } from "@/features/customers/customer-utils"
+import { loadingState, type ResourceState } from "@/shared/resource-state"
 
-export type CustomersState =
-  | { status: "loading"; data: CustomerResponse[]; error: null }
-  | { status: "success"; data: CustomerResponse[]; error: null }
-  | { status: "error"; data: CustomerResponse[]; error: string }
-
-function loadingState(): CustomersState {
-  return { status: "loading", data: [], error: null }
-}
+export type CustomersState = ResourceState<CustomerResponse>
 
 async function loadCustomers(): Promise<CustomersState> {
   try {

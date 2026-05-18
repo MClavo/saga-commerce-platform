@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react"
 
 import { AppShell } from "@/components/layout/AppShell"
+import { MetricCard } from "@/components/shared/MetricCard"
+import { PageHeader } from "@/components/shared/PageHeader"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CustomerDetailSheet } from "@/features/customers/components/CustomerDetailSheet"
 import { CustomerFilters } from "@/features/customers/components/CustomerFilters"
 import { CustomerFormDialog } from "@/features/customers/components/CustomerFormDialog"
@@ -73,34 +74,27 @@ export function CustomersPage() {
   return (
     <AppShell>
       <div className="flex flex-col gap-6">
-        <section className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Customers</p>
-              <Badge variant="outline">Restricted: Customer Support / Admin</Badge>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h1 className="max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl">Manage customers used by order validation.</h1>
-              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-                Customer records stay focused: identity, email, and optional address. They support the saga but should not dominate the demo.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-start gap-2 lg:justify-end">
+        <PageHeader
+          eyebrow="Customers"
+          title="Manage customers used by order validation."
+          description="Customer records stay focused: identity, email, and optional address. They support the saga but should not dominate the demo."
+          badge={<Badge variant="outline">Restricted: Customer Support / Admin</Badge>}
+          actions={
+            <>
             <Button type="button" variant="outline" onClick={() => void refresh()} disabled={isRefreshing}>
               {isRefreshing ? "Refreshing" : "Refresh"}
             </Button>
             <Button type="button" onClick={() => setIsCreateOpen(true)}>
               Create Customer
             </Button>
-          </div>
-        </section>
+            </>
+          }
+        />
 
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_1fr_0.7fr]">
-          <Metric label="Total customers" value={metrics.total} />
-          <Metric label="With address" value={metrics.withAddress} />
-          <Metric label="Missing address" value={metrics.missingAddress} />
+          <MetricCard label="Total customers" value={metrics.total} />
+          <MetricCard label="With address" value={metrics.withAddress} />
+          <MetricCard label="Missing address" value={metrics.missingAddress} />
         </section>
 
         <CustomerFilters search={search} onSearchChange={setSearch} onReset={resetSearch} />
@@ -142,18 +136,5 @@ export function CustomersPage() {
         onSubmit={submitDeleteCustomer}
       />
     </AppShell>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <Card size="sm">
-      <CardContent className="flex items-center justify-between gap-3">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <Badge variant="secondary" className="font-mono">
-          {value}
-        </Badge>
-      </CardContent>
-    </Card>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react"
+import { useState, type FormEvent } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import type { CreateProductRequest, ProductResponse, UpdateProductRequest } from "@/features/products/product-api"
 
@@ -104,32 +105,42 @@ function ProductFormContent({
       </DialogHeader>
 
       <form className="flex flex-col gap-4" onSubmit={(event) => void handleSubmit(event)}>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Name" helper="Required product name.">
+        <FieldGroup className="sm:grid sm:grid-cols-2">
+          <Field>
+            <FieldLabel>Name</FieldLabel>
             <Input value={values.name} onChange={(event) => updateField("name", event.target.value)} />
+            <FieldDescription>Required product name.</FieldDescription>
           </Field>
-          <Field label="Category ID" helper="Existing numeric category id.">
+          <Field>
+            <FieldLabel>Category ID</FieldLabel>
             <Input value={values.categoryId} inputMode="numeric" onChange={(event) => updateField("categoryId", event.target.value)} />
+            <FieldDescription>Existing numeric category id.</FieldDescription>
           </Field>
-          <Field label="Price" helper="EUR demo price; backend stores numeric amount.">
+          <Field>
+            <FieldLabel>Price</FieldLabel>
             <Input value={values.price} inputMode="decimal" onChange={(event) => updateField("price", event.target.value)} />
+            <FieldDescription>EUR demo price; backend stores numeric amount.</FieldDescription>
           </Field>
           {mode === "create" ? (
-            <Field label="Available quantity" helper="Initial available stock.">
+            <Field>
+              <FieldLabel>Available quantity</FieldLabel>
               <Input
                 value={values.availableQuantity}
                 inputMode="numeric"
                 onChange={(event) => updateField("availableQuantity", event.target.value)}
               />
+              <FieldDescription>Initial available stock.</FieldDescription>
             </Field>
           ) : null}
-        </div>
+        </FieldGroup>
 
-        <Field label="Description" helper="Short operational catalog description.">
+        <Field>
+          <FieldLabel>Description</FieldLabel>
           <Input value={values.description} onChange={(event) => updateField("description", event.target.value)} />
+          <FieldDescription>Short operational catalog description.</FieldDescription>
         </Field>
 
-        {error ? <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+        <FieldError>{error}</FieldError>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
@@ -141,16 +152,6 @@ function ProductFormContent({
         </DialogFooter>
       </form>
     </DialogContent>
-  )
-}
-
-function Field({ label, helper, children }: { label: string; helper: string; children: ReactNode }) {
-  return (
-    <label className="flex flex-col gap-2">
-      <span className="text-sm font-medium">{label}</span>
-      {children}
-      <span className="text-xs text-muted-foreground">{helper}</span>
-    </label>
   )
 }
 

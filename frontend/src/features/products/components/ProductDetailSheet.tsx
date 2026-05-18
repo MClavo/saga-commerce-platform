@@ -1,3 +1,4 @@
+import { DetailItem } from "@/components/shared/DetailItem"
 import { ProductStockBadge } from "@/features/products/components/ProductStockBadge"
 import type { ProductResponse } from "@/features/products/product-api"
 import { formatMoney } from "@/shared/formatters"
@@ -49,14 +50,5 @@ export function ProductDetailSheet({ product, open, onOpenChange }: ProductDetai
         ) : null}
       </SheetContent>
     </Sheet>
-  )
-}
-
-function DetailItem({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="flex flex-col gap-1 rounded-xl border p-3">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={mono ? "font-mono text-sm font-medium" : "text-sm font-medium"}>{value}</span>
-    </div>
   )
 }

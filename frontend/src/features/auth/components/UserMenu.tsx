@@ -2,7 +2,7 @@ import { LogOut } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { DemoAccountsDialog } from "@/components/auth/DemoAccountsDialog"
+import { DemoAccountsDialog } from "@/features/auth/components/DemoAccountsDialog"
 import { useAuth } from "@/features/auth/use-auth"
 
 export function UserMenu() {

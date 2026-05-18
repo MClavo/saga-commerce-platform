@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react"
 
-import { RoleGuard } from "@/components/auth/RoleGuard"
+import { RoleGuard } from "@/features/auth/components/RoleGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import { Badge } from "@/components/ui/badge"
+import { MetricCard } from "@/components/shared/MetricCard"
+import { PageHeader } from "@/components/shared/PageHeader"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { ProductDetailSheet } from "@/features/products/components/ProductDetailSheet"
 import { ProductFilters, type StockFilter } from "@/features/products/components/ProductFilters"
 import { ProductFormDialog } from "@/features/products/components/ProductFormDialog"
@@ -64,20 +64,12 @@ export function CatalogPage() {
   return (
     <AppShell>
       <div className="flex flex-col gap-6">
-        <section className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
-          <div className="flex flex-col gap-3">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Catalog / Products</p>
-            <div className="flex flex-col gap-2">
-              <h1 className="max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl">
-                Inspect stock before saga reservation touches it.
-              </h1>
-              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-                Product stock is operational state. This page keeps price, category, and available quantity visible for demo review.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-start gap-2 lg:justify-end">
+        <PageHeader
+          eyebrow="Catalog / Products"
+          title="Inspect stock before saga reservation touches it."
+          description="Product stock is operational state. This page keeps price, category, and available quantity visible for demo review."
+          actions={
+            <>
             <Button type="button" variant="outline" onClick={() => void refresh()} disabled={isRefreshing}>
               {isRefreshing ? "Refreshing" : "Refresh"}
             </Button>
@@ -93,14 +85,15 @@ export function CatalogPage() {
                 Create Product
               </Button>
             </RoleGuard>
-          </div>
-        </section>
+            </>
+          }
+        />
 
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_1fr_0.7fr]">
-          <Metric label="Total products" value={metrics.total} />
-          <Metric label="Low stock" value={metrics.lowStock} />
-          <Metric label="Out of stock" value={metrics.outOfStock} />
-          <Metric label="Categories" value={metrics.categories} />
+          <MetricCard label="Total products" value={metrics.total} />
+          <MetricCard label="Low stock" value={metrics.lowStock} />
+          <MetricCard label="Out of stock" value={metrics.outOfStock} />
+          <MetricCard label="Categories" value={metrics.categories} />
         </section>
 
         <ProductFilters
@@ -150,18 +143,5 @@ export function CatalogPage() {
         onSubmit={(quantityDelta) => (adjustingProduct ? adjustStock(adjustingProduct.id, { quantityDelta }) : Promise.resolve())}
       />
     </AppShell>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <Card size="sm">
-      <CardContent className="flex items-center justify-between gap-3">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <Badge variant="secondary" className="font-mono">
-          {value}
-        </Badge>
-      </CardContent>
-    </Card>
   )
 }

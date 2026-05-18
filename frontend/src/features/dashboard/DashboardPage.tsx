@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/AppShell"
+import { PageHeader } from "@/components/shared/PageHeader"
 import { Button } from "@/components/ui/button"
 import { SummaryCard } from "@/features/dashboard/components/SummaryCard"
 import { LatestOrdersCard } from "@/features/dashboard/components/LatestOrdersCard"
@@ -12,24 +13,17 @@ export function DashboardPage() {
   return (
     <AppShell>
       <div className="flex flex-col gap-6">
-        <section className="grid gap-4 lg:grid-cols-[1.45fr_0.55fr] lg:items-end">
-          <div className="flex flex-col gap-3">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Technical demo console</p>
-            <div className="flex flex-col gap-2">
-              <h1 className="max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl">
-                Operational view of the Ecommerce backend.
-              </h1>
-              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-                Real counts, role-aware sections, latest saga activity, and local infrastructure links for reviewers.
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-start lg:justify-end">
+        <PageHeader
+          eyebrow="Technical demo console"
+          title="Operational view of the Ecommerce backend."
+          description="Real counts, role-aware sections, latest saga activity, and local infrastructure links for reviewers."
+          className="lg:grid-cols-[1.45fr_0.55fr]"
+          actions={
             <Button type="button" variant="outline" onClick={() => void dashboard.refresh()} disabled={dashboard.isRefreshing}>
               {dashboard.isRefreshing ? "Refreshing" : "Refresh data"}
             </Button>
-          </div>
-        </section>
+          }
+        />
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-[1.2fr_0.9fr_1.1fr_0.8fr]">
           <SummaryCard

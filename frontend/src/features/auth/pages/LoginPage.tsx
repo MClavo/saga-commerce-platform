@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom"
 
-import { DemoAccountsDialog } from "@/components/auth/DemoAccountsDialog"
+import { DemoAccountsDialog } from "@/features/auth/components/DemoAccountsDialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,7 +28,7 @@ export function LoginPage() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background p-6">
+      <main className="flex min-h-[100dvh] items-center justify-center bg-background p-6">
         <Card className="w-full max-w-xl">
           <CardHeader>
             <CardTitle>Checking session</CardTitle>
@@ -47,7 +47,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-6">
+    <main className="flex min-h-[100dvh] items-center justify-center bg-background p-6">
       <Card className="w-full max-w-xl">
         <CardHeader>
           <Badge className="w-fit" variant="secondary">

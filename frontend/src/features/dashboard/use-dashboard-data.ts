@@ -6,42 +6,13 @@ import { listPayments, type PaymentResponse } from "@/features/payments/payment-
 import { listProducts, type ProductResponse } from "@/features/products/product-api"
 import { useAuth } from "@/features/auth/use-auth"
 import { compareByNewestDateThenId } from "@/shared/formatters"
+import { loadResource, loadingState, restrictedState, type ResourceState } from "@/shared/resource-state"
 import { activeOrderStatuses } from "@/shared/status-meta"
 import type { Authority } from "@/shared/auth-types"
 
 export const customerReadRoles: Authority[] = ["ROLE_CUSTOMER_SUPPORT", "ROLE_ADMIN"]
 export const orderReadRoles: Authority[] = ["ROLE_ORDER_MANAGER", "ROLE_ADMIN"]
 export const paymentReadRoles: Authority[] = ["ROLE_ORDER_MANAGER", "ROLE_ADMIN"]
-
-export type ResourceState<T> =
-  | { status: "loading"; data: T[]; error: null }
-  | { status: "success"; data: T[]; error: null }
-  | { status: "error"; data: T[]; error: string }
-  | { status: "restricted"; data: T[]; error: null; roles: Authority[] }
-
-async function loadResource<T>(loader: () => Promise<T[]>): Promise<ResourceState<T>> {
-  try {
-    return {
-      status: "success",
-      data: await loader(),
-      error: null,
-    }
-  } catch (caught) {
-    return {
-      status: "error",
-      data: [],
-      error: caught instanceof Error ? caught.message : "Request failed",
-    }
-  }
-}
-
-function loadingState<T>(): ResourceState<T> {
-  return { status: "loading", data: [], error: null }
-}
-
-function restrictedState<T>(roles: Authority[]): ResourceState<T> {
-  return { status: "restricted", data: [], error: null, roles }
-}
 
 async function loadDashboardResources(
   canReadCustomers: boolean,

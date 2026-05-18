@@ -1,12 +1,12 @@
 import { createBrowserRouter, Navigate } from "react-router-dom"
 
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute"
 import { RootRedirect } from "@/app/RootRedirect"
 import { CustomersPage } from "@/features/customers/CustomersPage"
 import { DashboardPage } from "@/features/dashboard/DashboardPage"
 import { CatalogPage } from "@/features/products/CatalogPage"
-import { LoginPage } from "@/pages/LoginPage"
-import { UnauthorizedPage } from "@/pages/UnauthorizedPage"
+import { LoginPage } from "@/features/auth/pages/LoginPage"
+import { UnauthorizedPage } from "@/features/auth/pages/UnauthorizedPage"
 
 export const router = createBrowserRouter([
   {

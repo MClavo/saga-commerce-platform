@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button"
+import { DetailItem } from "@/components/shared/DetailItem"
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import type { CustomerResponse } from "@/features/customers/customer-api"
 import { formatAddressSummary, formatCustomerName } from "@/features/customers/customer-utils"
-import { cn } from "@/lib/utils"
 
 type CustomerDetailSheetProps = {
   customer: CustomerResponse | null
@@ -46,14 +46,5 @@ export function CustomerDetailSheet({ customer, open, onOpenChange, onEdit, onDe
         ) : null}
       </SheetContent>
     </Sheet>
-  )
-}
-
-function DetailItem({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="flex flex-col gap-1 rounded-xl border p-3">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={cn("text-sm font-medium", mono && "font-mono")}>{value}</span>
-    </div>
   )
 }

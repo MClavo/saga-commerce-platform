@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
+import { EmptyState, ErrorState, RestrictedState, TableSkeleton } from "@/components/shared/DataState"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import {
   Table,
@@ -11,9 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { OrderResponse } from "@/features/orders/order-api"
-import type { ResourceState } from "@/features/dashboard/use-dashboard-data"
+import type { ResourceState } from "@/shared/resource-state"
 import { formatCompactDateTime, formatMoney } from "@/shared/formatters"
-import { formatRequiredRoles } from "@/shared/role-labels"
 import { getOrderStatusMeta } from "@/shared/status-meta"
 
 type LatestOrdersCardProps = {
@@ -40,9 +39,9 @@ export function LatestOrdersCard({ state, orders, hasMore }: LatestOrdersCardPro
       </CardHeader>
       <CardContent>
         {state.status === "loading" ? <TableSkeleton columns={5} /> : null}
-        {state.status === "restricted" ? <Restricted roles={state.roles} /> : null}
-        {state.status === "error" ? <p className="text-sm text-destructive">{state.error}</p> : null}
-        {state.status === "success" && orders.length === 0 ? <Empty label="No orders have been created yet." /> : null}
+        {state.status === "restricted" ? <RestrictedState roles={state.roles} /> : null}
+        {state.status === "error" ? <ErrorState compact message={state.error} /> : null}
+        {state.status === "success" && orders.length === 0 ? <EmptyState compact title="No orders have been created yet." /> : null}
         {state.status === "success" && orders.length > 0 ? (
           <Table>
             <TableHeader>
@@ -71,27 +70,5 @@ export function LatestOrdersCard({ state, orders, hasMore }: LatestOrdersCardPro
         ) : null}
       </CardContent>
     </Card>
-  )
-}
-
-function Restricted({ roles }: { roles: string[] }) {
-  return <p className="text-sm text-muted-foreground">Restricted: requires {formatRequiredRoles(roles)}.</p>
-}
-
-function Empty({ label }: { label: string }) {
-  return <p className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">{label}</p>
-}
-
-function TableSkeleton({ columns }: { columns: number }) {
-  return (
-    <div className="flex flex-col gap-2">
-      {Array.from({ length: 5 }).map((_, row) => (
-        <div key={row} className="grid gap-2" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
-          {Array.from({ length: columns }).map((__, column) => (
-            <Skeleton key={column} className="h-7" />
-          ))}
-        </div>
-      ))}
-    </div>
   )
 }

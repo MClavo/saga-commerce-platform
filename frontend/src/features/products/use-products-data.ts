@@ -10,30 +10,12 @@ import {
   type StockAdjustmentRequest,
   type UpdateProductRequest,
 } from "@/features/products/product-api"
+import { loadResource, loadingState, type ResourceState } from "@/shared/resource-state"
 
-export type ProductsState =
-  | { status: "loading"; data: ProductResponse[]; error: null }
-  | { status: "success"; data: ProductResponse[]; error: null }
-  | { status: "error"; data: ProductResponse[]; error: string }
-
-function loadingState(): ProductsState {
-  return { status: "loading", data: [], error: null }
-}
+export type ProductsState = ResourceState<ProductResponse>
 
 async function loadProducts(): Promise<ProductsState> {
-  try {
-    return {
-      status: "success",
-      data: await listProducts(),
-      error: null,
-    }
-  } catch (caught) {
-    return {
-      status: "error",
-      data: [],
-      error: caught instanceof Error ? caught.message : "Product request failed",
-    }
-  }
+  return loadResource(listProducts, "Product request failed")
 }
 
 export function useProductsData() {

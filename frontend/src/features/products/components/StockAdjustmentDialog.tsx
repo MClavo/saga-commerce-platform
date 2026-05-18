@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import type { ProductResponse } from "@/features/products/product-api"
 
@@ -85,13 +86,13 @@ function StockAdjustmentContent({
       </DialogHeader>
 
       <form className="flex flex-col gap-4" onSubmit={(event) => void handleSubmit(event)}>
-        <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Quantity delta</span>
+        <Field>
+          <FieldLabel>Quantity delta</FieldLabel>
           <Input value={quantityDelta} inputMode="numeric" onChange={(event) => setQuantityDelta(event.target.value)} />
-          <span className="text-xs text-muted-foreground">Positive adds stock. Negative removes available stock.</span>
-        </label>
+          <FieldDescription>Positive adds stock. Negative removes available stock.</FieldDescription>
+        </Field>
 
-        {error ? <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+        <FieldError>{error}</FieldError>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>

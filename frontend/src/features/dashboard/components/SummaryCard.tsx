@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge"
+import { ErrorState, RestrictedState } from "@/components/shared/DataState"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import type { ResourceState } from "@/features/dashboard/use-dashboard-data"
-import { formatRequiredRoles } from "@/shared/role-labels"
+import type { ResourceState } from "@/shared/resource-state"
 
 type SummaryCardProps<T> = {
   title: string
@@ -39,11 +39,9 @@ export function SummaryCard<T>({ title, description, state, count, detail }: Sum
           </div>
         ) : null}
 
-        {state.status === "restricted" ? (
-          <p className="text-sm text-muted-foreground">Restricted: requires {formatRequiredRoles(state.roles)}.</p>
-        ) : null}
+        {state.status === "restricted" ? <RestrictedState roles={state.roles} /> : null}
 
-        {state.status === "error" ? <p className="text-sm text-destructive">{state.error}</p> : null}
+        {state.status === "error" ? <ErrorState compact message={state.error} /> : null}
       </CardContent>
     </Card>
   )

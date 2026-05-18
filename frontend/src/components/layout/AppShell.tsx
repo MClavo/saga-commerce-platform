@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
 
-import { UserMenu } from "@/components/auth/UserMenu"
+import { UserMenu } from "@/features/auth/components/UserMenu"
 import { LocalDevToolsMenu } from "@/components/layout/LocalDevToolsMenu"
 import { cn } from "@/lib/utils"
 

@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { EmptyState, ErrorState, TableSkeleton } from "@/components/shared/DataState"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -37,13 +37,10 @@ export function ProductTable({ state, products, isAdmin, onView, onEdit, onAdjus
         </div>
       </CardHeader>
       <CardContent>
-        {state.status === "loading" ? <ProductTableSkeleton /> : null}
-        {state.status === "error" ? <p className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">{state.error}</p> : null}
+        {state.status === "loading" ? <TableSkeleton columns={6} rows={7} className="grid gap-2 md:grid-cols-[1.5fr_0.8fr_0.6fr_0.6fr_0.8fr_1fr]" /> : null}
+        {state.status === "error" ? <ErrorState message={state.error} /> : null}
         {state.status === "success" && products.length === 0 ? (
-          <div className="rounded-xl bg-muted p-6">
-            <p className="font-medium">No products match current filters.</p>
-            <p className="mt-1 text-sm text-muted-foreground">Reset filters or create a product as Admin.</p>
-          </div>
+          <EmptyState title="No products match current filters." description="Reset filters or create a product as Admin." />
         ) : null}
         {state.status === "success" && products.length > 0 ? (
           <Table>
@@ -98,19 +95,5 @@ export function ProductTable({ state, products, isAdmin, onView, onEdit, onAdjus
         ) : null}
       </CardContent>
     </Card>
-  )
-}
-
-function ProductTableSkeleton() {
-  return (
-    <div className="flex flex-col gap-2">
-      {Array.from({ length: 7 }).map((_, row) => (
-        <div key={row} className="grid gap-2 md:grid-cols-[1.5fr_0.8fr_0.6fr_0.6fr_0.8fr_1fr]">
-          {Array.from({ length: 6 }).map((__, column) => (
-            <Skeleton key={column} className="h-8" />
-          ))}
-        </div>
-      ))}
-    </div>
   )
 }
