@@ -42,6 +42,17 @@ x-mail-env: &mail-env
   MAIL_PASSWORD: maildev
 
 services:
+  frontend:
+    <<: *service-defaults
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - gateway
+  
   config-server:
     <<: *service-defaults
     image: ecommerce/config-server:local-ecommerce
