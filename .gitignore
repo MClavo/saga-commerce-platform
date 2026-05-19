@@ -4,6 +4,3 @@
 
 build/
 .gradle/
-
-.agents/
-.opencode/

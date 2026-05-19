@@ -2,7 +2,7 @@
 
 ## Repo Shape
 - No root Gradle build or wrapper; each `services/<name>` folder is a separate Gradle project with its own `gradlew`, `settings.gradle`, and `build.gradle`.
-- Services are `config-server`, `discovery`, `gateway`, `customer`, `product`, `order`, `payment`, and `notification`.
+- Services are `config-server`, `discovery`, `gateway`, `customer`, `product`, `order`, `payment`, and `notification`. The React demo frontend lives separately under `frontend/`.
 - Runtime config lives in `services/config-server/src/main/resources/configurations/*.yml`; most service `application.yml` files only set `spring.application.name` and `optional:configserver:http://localhost:8888`.
 
 ## Commands
@@ -13,6 +13,7 @@
 - Run one service: `./gradlew bootRun`.
 - Start infrastructure from repo root: `docker compose up -d`.
 - Full local startup order: infrastructure, `config-server`, `discovery`, domain services, then `gateway`.
+- Frontend commands run from `frontend/`; prefer Bun commands already used in the project (`bun install`, `bun dev`, `bun run build`).
 - No CI, pre-commit, lint, formatter, or root task-runner config is present; do not invent mandatory checks.
 
 ## Runtime
@@ -20,8 +21,10 @@
 - Docker Compose exposes Postgres `5432`, MongoDB `27017`, Kafka `9092`, MailDev `1080`/`1025`, Zipkin `9411`, Keycloak `9098`, pgAdmin `5050`, and Mongo Express `8081`.
 - Configured service ports: config `8888`, discovery `8761`, gateway `8222`, customer `8090`, product `8050`, order `8070`, payment `8060`, notification `8040`.
 - Keycloak issuer is `http://localhost:9098/realms/ecommerce`; gateway and domain services require JWT except `/actuator/health`.
+- For browser OAuth redirects through the gateway, keep redirect URIs browser-visible (`localhost` with the correct external port). Docker DNS names such as `gateway` are only for container-to-container routing, not Keycloak browser redirects.
 - Notification service denies all HTTP except `/actuator/health`; it is Kafka/email driven, not REST driven.
 - VS Code launch configs read an ignored root `.env`; do not commit `.env`.
+- If the frontend is served through Nginx, preserve `Host`, `X-Forwarded-Host`, `X-Forwarded-Port`, and `X-Forwarded-Proto` when proxying to the gateway; otherwise Spring/OAuth may generate redirect URIs such as `http://localhost/login/oauth2/code/keycloak` without the expected port.
 
 ## Data
 - Postgres init creates `product`, `orders`, and `payment` databases via `docker/postgres/init/01-create-databases.sql`.
@@ -48,7 +51,7 @@
   - `product.reservation.succeeded`, or
   - `product.reservation.failed`
 - `product.reservation.succeeded` must include the reserved product snapshots and confirmed prices; those prices are the source of truth for order total and payment amount.
-- Order Service consumes `product.reservation.succeeded`, stores product snapshots in order lines, calculates `totalAmount`, updates order status to `PRODUCT_RESERVED`, then publishes `payment.requested`.
+- Order Service consumes `product.reservation.succeeded`, stores product snapshots in order lines, calculates `totalAmount`, updates order status to `AWAITING_PAYMENT`, then publishes `payment.requested`.
 - Order Service consumes `product.reservation.failed`, updates order status to `PRODUCT_RESERVATION_FAILED`, then publishes `notification.requested`.
 - Payment Service consumes only `payment.requested`, creates/processes the payment using the amount provided by Order Service, then publishes:
   - `payment.confirmed`, or
@@ -70,6 +73,8 @@
 ## Code Notes
 - Order Feign clients use service names and paths in annotations; `application.client.*` URLs in config are not currently wired into those clients.
 - `FeignSecurityConfig` propagates the current JWT to downstream Feign calls; keep that behavior when refactoring order clients.
+- Do not add Spring Session or Redis unless the auth architecture is deliberately changed; the current demo should avoid accidental session infrastructure.
 - Gateway routes only customers, orders, products, and payments under `/api/v1/**`; notification has no gateway route.
+- Frontend is a demo UI built with Vite/React/TypeScript, React Router, and shadcn-style components. Keep it simple and demo-oriented; do not over-engineer state management or introduce large frontend architecture unless explicitly requested.
 - `notification` intentionally depends on `spring-boot-starter-webmvc` because Eureka client registration needs it in this Boot 4 setup; do not remove it as unused.
 - Customer uses MapStruct; generated mapper implementations live under `build` and should not be edited.
