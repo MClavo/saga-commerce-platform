@@ -10,9 +10,9 @@
 
 
 
-  # E-commerce Microservices Platform
+  # Saga E-commerce Microservices Platform
 
-  **A full-stack e-commerce demo built around Spring Boot microservices, Keycloak security, Kafka messaging, and a Saga-style order workflow.**
+  **A full-stack e-commerce demo built around Spring Boot 4 microservices, Kafka messaging, Keycloak security, Docker and a Saga-style order workflow.**
 
 
 </div>
@@ -95,12 +95,10 @@
 
 ## Overview
 
-<p align="center">
-  <video controls width="70%">
-    <source src="docs/demo/saga-happy-path.mp4" type="video/mp4">
-  </video>
-</p>
-
+<div align="center">
+  <video controls width="70%" src="https://github.com/user-attachments/assets/8db52c1d-f08d-42b9-8e89-26ccb805d2cc" type="video/mp4"></video>
+  Watch Saga happy path demo
+</div>
 
 This repository is a portfolio oriented e-commerce system that focuses on distributed backend architecture rather than storefront polish. It includes a React operations console, an API Gateway, service discovery and centralized configuration, role-based security with Keycloak, database persistence per service, Kafka-based integration events, local observability tooling, and tests around the core business flow.
 
@@ -112,15 +110,14 @@ The main workflow is an **event driven, orchestrated Saga** for order processing
 ### Saga Fail and Compensation Demo
 The saga route guides through the happy path, and also simulates a payment failure to show how the Saga rolls back product reservations and notifies the customer. The video below shows that flow end to end, including the compensation step after payment failure.
 
-<p align="center">
-  <video controls width="70%">
-    <source src="docs/demo/saga-fail-restore-stock.mp4" type="video/mp4">
-  </video>
-</p>
+<div align="center">
+  <video controls width="70%" src="https://github.com/user-attachments/assets/f79526ac-80ce-481c-9757-dc1ba5cab2c3" type="video/mp4"></video>
+  Watch Saga failure and compensation demo
+</div>
 
 ## Architecture
 
-![Architecture diagram placeholder](docs/diagrams/architecture.svg)
+![Architecture diagram placeholder](docs/diagrams/Architecture.svg)
 
 The backend is split into independently bounded services under `services/`. The frontend lives separately under `frontend/` and talks only to the Gateway.
 
