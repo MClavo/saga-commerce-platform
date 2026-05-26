@@ -2,6 +2,7 @@
 
 ![Java 21](https://img.shields.io/badge/Java-21-007396?style=flat-square)
 ![Spring Boot 4](https://img.shields.io/badge/Spring%20Boot-4.0.6-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-Gateway%20%7C%20Config%20%7C%20Eureka-6DB33F?style=flat-square&logo=spring&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=111)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-336791?style=flat-square&logo=postgresql&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Document%20Store-47A248?style=flat-square&logo=mongodb&logoColor=white)
